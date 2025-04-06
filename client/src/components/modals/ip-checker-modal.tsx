@@ -79,54 +79,48 @@ export default function IpCheckerModal({
     setIpAddress(formattedValue);
   };
   
-  // Улучшенная функция вставки из буфера обмена с поддержкой мобильных устройств
-  const handlePaste = async () => {
+  // Функция для помощи при вставке IP на мобильных устройствах
+  const handlePaste = () => {
     try {
-      let text;
-      
-      // Проверяем, поддерживается ли Clipboard API
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        text = await navigator.clipboard.readText();
-      } else {
-        // Альтернативный метод для мобильных устройств
-        // Фокусируемся на поле ввода и программно вызываем команду вставки
-        if (inputRef.current) {
-          inputRef.current.focus();
-          
-          // Создаем и вызываем событие paste
-          document.execCommand('paste');
-          
-          // Получаем текущее значение поля после вставки
-          text = inputRef.current.value;
-        }
-      }
-      
-      if (text) {
-        // Сразу форматируем текст
-        const formattedText = formatIpInput(text);
-        
-        // Устанавливаем отформатированное значение
-        setIpAddress(formattedText);
-      }
+      // На мобильных устройствах невозможно программно получить доступ к буферу обмена
+      // Поэтому предлагаем пользователю удобный способ вставки вручную
       
       // Фокусируемся на поле ввода
       if (inputRef.current) {
         inputRef.current.focus();
       }
-    } catch (error) {
-      // В случае ошибки доступа к буферу обмена, показываем сообщение
-      console.error("Clipboard error:", error);
       
-      toast({
-        title: "Вставьте вручную",
-        description: "Используйте долгое нажатие + вставить на поле ввода",
-        variant: "default",
-      });
+      // Проверка если это мобильное устройство
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      // Фокусируемся на поле ввода для удобства ручной вставки
-      if (inputRef.current) {
-        inputRef.current.focus();
+      if (isMobile) {
+        // Для мобильных устройств просто показываем подсказку
+        toast({
+          title: "Вставьте IP адрес",
+          description: "Нажмите и удерживайте поле ввода, затем выберите 'Вставить'",
+          variant: "default",
+        });
+      } else {
+        // Для десктопа используем Clipboard API
+        navigator.clipboard.readText().then(text => {
+          if (text) {
+            // Форматируем текст
+            const formattedText = formatIpInput(text);
+            // Устанавливаем отформатированное значение
+            setIpAddress(formattedText);
+          }
+        }).catch(error => {
+          console.error("Clipboard error:", error);
+          
+          toast({
+            title: "Не удалось вставить",
+            description: "Пожалуйста, вставьте IP адрес вручную",
+            variant: "destructive",
+          });
+        });
       }
+    } catch (error) {
+      console.error("Paste error:", error);
     }
   };
   
@@ -166,7 +160,7 @@ export default function IpCheckerModal({
               </Label>
               <div className="flex space-x-2">
                 <Input 
-                  type="text" 
+                  type="tel" 
                   id="ipAddress" 
                   placeholder="Например: 8.8.8.8"
                   value={ipAddress}
@@ -175,7 +169,7 @@ export default function IpCheckerModal({
                   required
                   className="rounded"
                   pattern="[0-9.]+"
-                  inputMode="decimal"
+                  inputMode="tel"
                 />
                 <Button
                   type="button"
