@@ -22,7 +22,7 @@ export default function AppHeader({ user, onNavigate }: AppHeaderProps) {
             <span className="text-2xl font-semibold">₮</span>
           </span>
         </div>
-        <div className="text-sm text-gray-500">Баланс в ₮</div>
+        <div className="text-sm text-gray-500">Баланс в USDT</div>
       </div>
       
       {/* Action buttons */}
