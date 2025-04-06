@@ -158,26 +158,52 @@ export default function IpCheckerModal({
               <Label htmlFor="ipAddress" className="block text-sm font-medium text-gray-700 mb-1">
                 IP адрес
               </Label>
-              <div className="flex space-x-2">
-                <Input 
-                  type="tel" 
-                  id="ipAddress" 
-                  placeholder="Например: 8.8.8.8"
-                  value={ipAddress}
-                  onChange={handleIpInputChange}
-                  ref={inputRef}
-                  required
-                  className="rounded"
-                  pattern="[0-9.]+"
-                  inputMode="tel"
-                />
-                <Button
-                  type="button"
-                  onClick={handlePaste}
-                  className="min-w-[44px] px-3"
-                >
-                  <Clipboard className="h-4 w-4" />
-                </Button>
+              <div className="flex flex-col space-y-2">
+                <div className="flex space-x-2">
+                  <Input 
+                    type="text" 
+                    id="ipAddress" 
+                    placeholder="Например: 8.8.8.8"
+                    value={ipAddress}
+                    onChange={handleIpInputChange}
+                    ref={inputRef}
+                    required
+                    className="rounded"
+                    pattern="[0-9.]+"
+                    inputMode="numeric"
+                    onKeyPress={(e) => {
+                      // Разрешаем только цифры и точку
+                      const char = String.fromCharCode(e.charCode);
+                      if (!/[0-9.]/.test(char)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    onClick={handlePaste}
+                    className="min-w-[44px] px-3"
+                  >
+                    <Clipboard className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                {/* Добавляем виртуальную клавиатуру с точкой для мобильных устройств */}
+                <div className="flex justify-center mt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-9 px-6 text-lg"
+                    onClick={() => {
+                      setIpAddress(prev => prev + '.');
+                      if (inputRef.current) {
+                        inputRef.current.focus();
+                      }
+                    }}
+                  >
+                    Добавить точку (.)
+                  </Button>
+                </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Формат: IPv4 (например, 192.168.1.1)

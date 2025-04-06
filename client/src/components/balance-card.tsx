@@ -17,7 +17,7 @@ export default function BalanceCard({ balance, onTopUp }: BalanceCardProps) {
         
         <div className="flex items-baseline mt-2">
           <span className="text-3xl font-bold text-gray-800">{balance.toFixed(2)}</span>
-          <span className="ml-1 text-xl text-gray-500">USDT</span>
+          <span className="ml-1 text-xl text-gray-500">₮</span>
         </div>
         
         <Button 

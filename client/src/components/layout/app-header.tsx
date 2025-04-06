@@ -22,7 +22,7 @@ export default function AppHeader({ user, onNavigate }: AppHeaderProps) {
             <img src={tetherIcon} alt="USDT" className="w-6 h-6" />
           </span>
         </div>
-        <div className="text-sm text-gray-500">Баланс в USDT</div>
+        <div className="text-sm text-gray-500">Баланс в ₮</div>
       </div>
       
       {/* Action buttons */}

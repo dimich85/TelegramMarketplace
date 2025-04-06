@@ -68,7 +68,7 @@ export class MemStorage implements IStorage {
     const ipCheckService: InsertService = {
       name: "Проверка IP адреса",
       description: "Проверка IP на спам, блэклисты и определение геоданных",
-      price: 5.0,
+      price: 0.2,
       icon: "public",
       available: true,
     };
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
       const ipCheckTransaction: InsertTransaction = {
         userId: user.id,
         type: 'purchase',
-        amount: 5.0,
+        amount: 0.2,
         description: 'Проверка IP адреса',
         reference: null,
         serviceId: 1,
@@ -156,8 +156,8 @@ export class MemStorage implements IStorage {
       createDelayedTransaction(ipCheckTransaction, 5); // 5 дней назад
       createDelayedTransaction(vpnTransaction, 2); // 2 дня назад
       
-      // Обновляем баланс пользователя (50 - 5 - 20 = 25)
-      this.updateUserBalance(user.id, 25.0);
+      // Обновляем баланс пользователя (50 - 0.2 - 20 = 29.8)
+      this.updateUserBalance(user.id, 29.8);
       
       // Добавляем результат проверки IP
       const ipCheckResult: InsertIpCheck = {
@@ -204,7 +204,16 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
     const createdAt = new Date();
-    const user: User = { ...insertUser, id, balance: 0, createdAt };
+    // Обрабатываем nullable поля для соответствия типам
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      balance: 0, 
+      createdAt,
+      username: insertUser.username ?? null,
+      lastName: insertUser.lastName ?? null,
+      photoUrl: insertUser.photoUrl ?? null 
+    };
     this.users.set(id, user);
     return user;
   }
@@ -229,7 +238,11 @@ export class MemStorage implements IStorage {
 
   async createService(insertService: InsertService): Promise<Service> {
     const id = this.serviceIdCounter++;
-    const service: Service = { ...insertService, id };
+    const service: Service = { 
+      ...insertService, 
+      id,
+      available: insertService.available ?? true
+    };
     this.services.set(id, service);
     return service;
   }
@@ -247,7 +260,13 @@ export class MemStorage implements IStorage {
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
     const id = this.transactionIdCounter++;
     const createdAt = new Date();
-    const transaction: Transaction = { ...insertTransaction, id, createdAt };
+    const transaction: Transaction = { 
+      ...insertTransaction, 
+      id, 
+      createdAt,
+      serviceId: insertTransaction.serviceId ?? null,
+      reference: insertTransaction.reference ?? null
+    };
     this.transactions.set(id, transaction);
     return transaction;
   }
@@ -266,7 +285,17 @@ export class MemStorage implements IStorage {
   async createIpCheck(insertIpCheck: InsertIpCheck): Promise<IpCheck> {
     const id = this.ipCheckIdCounter++;
     const createdAt = new Date();
-    const ipCheck: IpCheck = { ...insertIpCheck, id, createdAt };
+    const ipCheck: IpCheck = { 
+      ...insertIpCheck, 
+      id, 
+      createdAt,
+      country: insertIpCheck.country ?? null,
+      city: insertIpCheck.city ?? null,
+      isp: insertIpCheck.isp ?? null,
+      isSpam: insertIpCheck.isSpam ?? null,
+      isBlacklisted: insertIpCheck.isBlacklisted ?? null,
+      details: insertIpCheck.details ?? null
+    };
     this.ipChecks.set(id, ipCheck);
     return ipCheck;
   }
