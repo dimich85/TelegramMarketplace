@@ -54,12 +54,9 @@ export default function Transactions({ user }: TransactionsProps) {
 
   return (
     <div className="pb-6">
-      {/* Заголовок страницы */}
-      <div className="bg-white p-4 mb-4 flex items-center">
-        <h1 className="text-xl font-bold">История</h1>
-        
-        {/* Отображение баланса */}
-        <div className="ml-auto text-right">
+      {/* Отображение баланса */}
+      <div className="bg-white p-4 mb-4 flex justify-end">
+        <div className="text-right">
           <div className="text-lg font-semibold">{user.balance.toFixed(2)} USDT</div>
           <div className="text-xs text-gray-500">Баланс</div>
         </div>
