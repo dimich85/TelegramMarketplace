@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { User, Service } from '@shared/schema';
 import ServiceCard from '@/components/service-card';
 import IpCheckerModal from '@/components/modals/ip-checker-modal';
+import { ArrowLeft } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 interface ServicesProps {
   user: User;
@@ -11,6 +13,7 @@ interface ServicesProps {
 export default function Services({ user }: ServicesProps) {
   const [showIpCheckerModal, setShowIpCheckerModal] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [, setLocation] = useLocation();
 
   // Fetch services
   const { data: services = [], isLoading, error } = useQuery<Service[]>({
@@ -46,26 +49,43 @@ export default function Services({ user }: ServicesProps) {
   }
 
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-6">Доступные услуги</h1>
-      
-      <div className="space-y-4">
-        {services.map(service => (
-          <ServiceCard 
-            key={service.id}
-            service={service}
-            onBuy={() => handleBuyService(service.id)}
-            userBalance={user.balance}
-            showFullDescription
-          />
-        ))}
-      </div>
-
-      {services.length === 0 && (
-        <div className="text-center p-10 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">Услуги временно недоступны</p>
+    <div className="pb-6">
+      {/* Заголовок страницы с кнопкой назад */}
+      <div className="bg-white p-4 mb-4 flex items-center">
+        <button
+          onClick={() => setLocation('/')}
+          className="mr-4 p-2 rounded-full hover:bg-gray-100"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h1 className="text-xl font-bold">Услуги</h1>
+        
+        {/* Отображение баланса */}
+        <div className="ml-auto text-right">
+          <div className="text-lg font-semibold">{user.balance.toFixed(2)} USDT</div>
+          <div className="text-xs text-gray-500">Баланс</div>
         </div>
-      )}
+      </div>
+      
+      <div className="px-4">
+        <div className="space-y-4">
+          {services.map(service => (
+            <ServiceCard 
+              key={service.id}
+              service={service}
+              onBuy={() => handleBuyService(service.id)}
+              userBalance={user.balance}
+              showFullDescription
+            />
+          ))}
+        </div>
+
+        {services.length === 0 && (
+          <div className="text-center p-10 bg-gray-50 rounded-lg">
+            <p className="text-gray-500">Услуги временно недоступны</p>
+          </div>
+        )}
+      </div>
 
       {/* IP Checker Modal */}
       <IpCheckerModal 
@@ -74,6 +94,6 @@ export default function Services({ user }: ServicesProps) {
         userId={user.id}
         serviceId={selectedServiceId}
       />
-    </>
+    </div>
   );
 }

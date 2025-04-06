@@ -37,7 +37,7 @@ export function initializeTelegramApp() {
 
 export function getTelegramUser(): TelegramUser | null {
   const tgWebApp = window.Telegram?.WebApp;
-  const isDevelopment = process.env.NODE_ENV !== 'production';
+  const isDevelopment = import.meta.env.MODE !== 'production';
   
   // Use real Telegram user if available
   if (tgWebApp && tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {

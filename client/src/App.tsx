@@ -14,9 +14,10 @@ import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 
 import AppHeader from "@/components/layout/app-header";
+import { showBackButton, hideBackButton, onBackButtonClicked } from "./lib/telegramWebApp";
 
 function App() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const { toast } = useToast();
   const isDevelopment = import.meta.env.MODE !== 'production';
@@ -35,6 +36,26 @@ function App() {
       });
     }
   }, [toast, isDevelopment]);
+
+  // Setup back button handling
+  useEffect(() => {
+    // Show back button when not on home page
+    if (location !== '/') {
+      showBackButton();
+      
+      // Configure back button handler
+      onBackButtonClicked(() => {
+        setLocation('/');
+      });
+    } else {
+      hideBackButton();
+    }
+    
+    // Clean up
+    return () => {
+      hideBackButton();
+    };
+  }, [location, setLocation]);
 
   // Authenticate user with server
   const { data: user, isLoading, error } = useQuery<User>({
@@ -78,21 +99,38 @@ function App() {
     );
   }
 
+  // Навигационный контент в зависимости от текущего маршрута
+  const renderContent = () => {
+    if (!user) return null;
+
+    // Отображение только соответствующего контента в зависимости от маршрута
+    switch (location) {
+      case '/services':
+        return <Services user={user} />;
+      case '/transactions':
+        return <Transactions user={user} />;
+      case '/profile':
+        return <Profile user={user} />;
+      case '/topup':
+        return <TopUp user={user} />;
+      case '/':
+        return <Home user={user} />;
+      default:
+        return <NotFound />;
+    }
+  };
+
   return (
     <div className="max-w-lg mx-auto bg-gray-100 min-h-screen shadow-lg">
       {user && (
         <>
-          <AppHeader user={user} onNavigate={(path) => setLocation(path)} />
+          {/* Показывать шапку только на главной странице */}
+          {location === '/' && (
+            <AppHeader user={user} onNavigate={(path) => setLocation(path)} />
+          )}
           
           <main>
-            <Switch>
-              <Route path="/" component={() => <Home user={user} />} />
-              <Route path="/services" component={() => <Services user={user} />} />
-              <Route path="/transactions" component={() => <Transactions user={user} />} />
-              <Route path="/profile" component={() => <Profile user={user} />} />
-              <Route path="/topup" component={() => <TopUp user={user} />} />
-              <Route component={NotFound} />
-            </Switch>
+            {renderContent()}
           </main>
         </>
       )}
