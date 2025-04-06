@@ -73,16 +73,16 @@ export class MemStorage implements IStorage {
       available: true,
     };
     
-    const vpnService: InsertService = {
-      name: "VPN Подписка",
-      description: "1 месяц анонимного доступа в интернет с защитой данных",
-      price: 0.5,
-      icon: "vpn_lock",
+    const phoneCheckService: InsertService = {
+      name: "Проверка номера телефона",
+      description: "Проверка номера телефона на мошенничество и наличие в базах спам-номеров",
+      price: 0.25,
+      icon: "phone",
       available: true,
     };
     
     this.createService(ipCheckService);
-    this.createService(vpnService);
+    this.createService(phoneCheckService);
   }
   
   private initializeDemoData() {
@@ -126,12 +126,12 @@ export class MemStorage implements IStorage {
         serviceId: 1,
       };
       
-      // Покупка VPN подписки
-      const vpnTransaction: InsertTransaction = {
+      // Покупка проверки номера телефона
+      const phoneCheckTransaction: InsertTransaction = {
         userId: user.id,
         type: 'purchase',
-        amount: 0.5,
-        description: 'VPN Подписка (1 месяц)',
+        amount: 0.25,
+        description: 'Проверка номера телефона',
         reference: null,
         serviceId: 2,
       };
@@ -154,10 +154,10 @@ export class MemStorage implements IStorage {
       // Создаем транзакции с разным временем
       createDelayedTransaction(topupTransaction, 7); // Неделю назад
       createDelayedTransaction(ipCheckTransaction, 5); // 5 дней назад
-      createDelayedTransaction(vpnTransaction, 2); // 2 дня назад
+      createDelayedTransaction(phoneCheckTransaction, 2); // 2 дня назад
       
-      // Обновляем баланс пользователя (50 - 0.2 - 0.5 = 49.3)
-      this.updateUserBalance(user.id, 49.3);
+      // Обновляем баланс пользователя (50 - 0.2 - 0.25 = 49.55)
+      this.updateUserBalance(user.id, 49.55);
       
       // Добавляем результат проверки IP
       const ipCheckResult: InsertIpCheck = {
