@@ -18,8 +18,8 @@ export default function AppHeader({ user, onNavigate }: AppHeaderProps) {
         <div className="flex items-center justify-center mb-1">
           <span className="text-3xl font-semibold">{user.balance.toFixed(2)}</span>
           <span className="ml-1 text-gray-700 flex items-center">
-            {/* USDT Icon */}
-            <img src={tetherIcon} alt="USDT" className="w-6 h-6" />
+            {/* Tether symbol */}
+            <span className="text-2xl font-semibold">₮</span>
           </span>
         </div>
         <div className="text-sm text-gray-500">Баланс в ₮</div>

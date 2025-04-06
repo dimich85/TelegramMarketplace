@@ -124,7 +124,7 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
             </div>
             <div>
               <Badge variant={isIncome ? 'default' : 'outline'} className={isIncome ? 'bg-green-500 hover:bg-green-600' : 'text-red-500 border-red-500'}>
-                {isIncome ? '+' : '-'}{transaction.amount.toFixed(2)} USDT
+                {isIncome ? '+' : '-'}{transaction.amount.toFixed(2)} ₮
               </Badge>
             </div>
           </div>

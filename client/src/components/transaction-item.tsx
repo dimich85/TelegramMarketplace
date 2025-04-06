@@ -32,7 +32,7 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
       </div>
       <div className="flex items-center">
         <span className={`font-semibold mr-2 ${isIncome ? 'text-green-500' : 'text-red-500'}`}>
-          {isIncome ? '+' : '-'}{transaction.amount.toFixed(2)} USDT
+          {isIncome ? '+' : '-'}{transaction.amount.toFixed(2)} ₮
         </span>
         <ChevronRight className="w-4 h-4 text-gray-400" />
       </div>
