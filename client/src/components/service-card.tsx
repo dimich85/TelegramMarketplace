@@ -28,7 +28,7 @@ export default function ServiceCard({
               {service.description}
             </p>
             <div className="mt-3 flex items-center">
-              <span className="font-semibold text-gray-800">{service.price.toFixed(2)} ₮</span>
+              <span className="font-semibold text-gray-800">{service.price.toFixed(2)} USDT</span>
               <Badge 
                 variant={service.available ? "default" : "destructive"}
                 className={`ml-2 px-2 py-0.5 text-xs rounded-full ${service.available ? "bg-green-500 hover:bg-green-600" : ""}`}

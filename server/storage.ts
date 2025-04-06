@@ -68,7 +68,7 @@ export class MemStorage implements IStorage {
     const ipCheckService: InsertService = {
       name: "Проверка IP адреса",
       description: "Проверка IP на спам, блэклисты и определение геоданных",
-      price: 0.2,
+      price: 5.0,
       icon: "public",
       available: true,
     };
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
       const ipCheckTransaction: InsertTransaction = {
         userId: user.id,
         type: 'purchase',
-        amount: 0.2,
+        amount: 5.0,
         description: 'Проверка IP адреса',
         reference: null,
         serviceId: 1,
@@ -156,8 +156,8 @@ export class MemStorage implements IStorage {
       createDelayedTransaction(ipCheckTransaction, 5); // 5 дней назад
       createDelayedTransaction(vpnTransaction, 2); // 2 дня назад
       
-      // Обновляем баланс пользователя (50 - 0.2 - 20 = 29.8)
-      this.updateUserBalance(user.id, 29.8);
+      // Обновляем баланс пользователя (50 - 5 - 20 = 25)
+      this.updateUserBalance(user.id, 25.0);
       
       // Добавляем результат проверки IP
       const ipCheckResult: InsertIpCheck = {

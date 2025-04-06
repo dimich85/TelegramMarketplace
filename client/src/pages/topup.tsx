@@ -78,7 +78,7 @@ export default function TopUp({ user }: TopUpProps) {
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <Label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                Сумма (₮)
+                Сумма (USDT)
               </Label>
               <Input 
                 type="text" 
@@ -88,7 +88,7 @@ export default function TopUp({ user }: TopUpProps) {
                 onChange={(e) => handleAmountChange(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Минимальная сумма пополнения: 10 ₮</p>
+              <p className="text-xs text-gray-500 mt-1">Минимальная сумма пополнения: 10 USDT</p>
             </div>
             
             <div className="mb-5">
@@ -100,7 +100,7 @@ export default function TopUp({ user }: TopUpProps) {
                   className="py-2"
                   onClick={() => handleQuickAmount('25')}
                 >
-                  25 ₮
+                  25 USDT
                 </Button>
                 <Button 
                   type="button"
@@ -108,7 +108,7 @@ export default function TopUp({ user }: TopUpProps) {
                   className="py-2"
                   onClick={() => handleQuickAmount('50')}
                 >
-                  50 ₮
+                  50 USDT
                 </Button>
                 <Button 
                   type="button"
@@ -116,7 +116,7 @@ export default function TopUp({ user }: TopUpProps) {
                   className="py-2"
                   onClick={() => handleQuickAmount('100')}
                 >
-                  100 ₮
+                  100 USDT
                 </Button>
               </div>
             </div>
