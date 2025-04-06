@@ -32,6 +32,45 @@ export function isValidIpAddress(ip: string): boolean {
 }
 
 /**
+ * Validates if the input string contains only digits and dots
+ * @param input The input string to validate
+ * @returns Boolean indicating if the string contains only digits and dots
+ */
+export function isIpInputValid(input: string): boolean {
+  const ipInputRegex = /^[0-9.]*$/;
+  return ipInputRegex.test(input);
+}
+
+/**
+ * Formats an IP address input by enforcing proper formatting
+ * @param input Raw input string 
+ * @returns Formatted IP address string
+ */
+export function formatIpInput(input: string): string {
+  // Remove any characters that aren't digits or dots
+  let sanitized = input.replace(/[^0-9.]/g, '');
+  
+  // Prevent multiple consecutive dots
+  sanitized = sanitized.replace(/\.{2,}/g, '.');
+  
+  // Ensure only 3 dots maximum
+  const parts = sanitized.split('.');
+  if (parts.length > 4) {
+    sanitized = parts.slice(0, 4).join('.');
+  }
+  
+  // Make sure each octet is no more than 3 digits
+  const validParts = parts.map(part => {
+    if (part.length > 3) {
+      return part.substring(0, 3);
+    }
+    return part;
+  });
+  
+  return validParts.join('.');
+}
+
+/**
  * Checks an IP address through the server API
  * @param ipAddress The IP address to check
  * @param userId The user ID

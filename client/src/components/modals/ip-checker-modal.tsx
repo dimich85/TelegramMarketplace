@@ -4,7 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { checkIpAddress, isValidIpAddress, generateIpReportDownload, IpCheckResult } from '@/lib/ipService';
+import { 
+  checkIpAddress, 
+  isValidIpAddress, 
+  generateIpReportDownload, 
+  IpCheckResult,
+  formatIpInput
+} from '@/lib/ipService';
 import { queryClient } from '@/lib/queryClient';
 import { Clipboard } from 'lucide-react';
 
@@ -65,41 +71,33 @@ export default function IpCheckerModal({
     }
   };
   
-  // Функция валидации ввода (только цифры и точки)
+  // Функция валидации и форматирования ввода IP
   const handleIpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Заменяем все символы, кроме цифр и точек
-    const sanitizedValue = value.replace(/[^0-9.]/g, '');
-    setIpAddress(sanitizedValue);
+    // Используем новую функцию форматирования из ipService
+    const formattedValue = formatIpInput(value);
+    setIpAddress(formattedValue);
   };
   
-  // Функция вставки из буфера обмена
+  // Улучшенная функция вставки из буфера обмена
   const handlePaste = async () => {
     try {
-      const text = await navigator.clipboard.readText();
+      // Получаем текст из буфера обмена
+      let text = await navigator.clipboard.readText();
       
-      // Проверяем, содержит ли текст правильный формат IP
-      const ipRegex = /^[\d.]+$/;
-      if (!ipRegex.test(text)) {
-        toast({
-          title: "Неверный формат",
-          description: "Скопированный текст не содержит корректный IP адрес (только цифры и точки)",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Сразу форматируем текст
+      text = formatIpInput(text);
       
-      // Устанавливаем значение и фокусируемся на поле ввода
+      // Устанавливаем отформатированное значение
       setIpAddress(text);
+      
+      // Фокусируемся на поле ввода
       if (inputRef.current) {
         inputRef.current.focus();
       }
     } catch (error) {
-      toast({
-        title: "Ошибка вставки",
-        description: "Не удалось получить доступ к буферу обмена",
-        variant: "destructive",
-      });
+      // В случае ошибки доступа к буферу обмена, продолжаем без уведомления
+      console.error("Clipboard error:", error);
     }
   };
   
@@ -146,20 +144,20 @@ export default function IpCheckerModal({
                   onChange={handleIpInputChange}
                   ref={inputRef}
                   required
-                  className="rounded-r-none"
+                  className="rounded-r-none border-r-0"
+                  inputMode="numeric"
                 />
                 <Button
                   type="button"
                   onClick={handlePaste}
-                  className="rounded-l-none px-3"
+                  className="rounded-l-none border-l-0 bg-white hover:bg-gray-50"
                   variant="outline"
-                  title="Вставить из буфера обмена"
                 >
-                  <Clipboard className="h-4 w-4" />
+                  <Clipboard className="h-4 w-4 text-gray-500" />
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Допускаются только цифры и точки
+                Формат: IPv4 (например, 192.168.1.1)
               </p>
             </div>
             
