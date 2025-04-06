@@ -1,6 +1,7 @@
 import { User } from '@shared/schema';
 import { ShoppingBag, PlusCircle, History, UserCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
+import tetherIcon from '@assets/icons8-tether-48.png';
 
 interface AppHeaderProps {
   user: User;
@@ -18,10 +19,7 @@ export default function AppHeader({ user, onNavigate }: AppHeaderProps) {
           <span className="text-3xl font-semibold">{user.balance.toFixed(2)}</span>
           <span className="ml-1 text-gray-700 flex items-center">
             {/* USDT Icon */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#26A17B"/>
-              <path d="M11.25 14.75V16.25H12.75V14.75H14.25V13.25H9.75V14.75H11.25ZM12 7.75C10.48 7.75 9.25 8.98 9.25 10.5H10.75C10.75 9.81 11.31 9.25 12 9.25C12.69 9.25 13.25 9.81 13.25 10.5C13.25 11.19 12.69 11.75 12 11.75V13.25C13.52 13.25 14.75 12.02 14.75 10.5C14.75 8.98 13.52 7.75 12 7.75Z" fill="#26A17B"/>
-            </svg>
+            <img src={tetherIcon} alt="USDT" className="w-6 h-6" />
           </span>
         </div>
         <div className="text-sm text-gray-500">Баланс в USDT</div>
