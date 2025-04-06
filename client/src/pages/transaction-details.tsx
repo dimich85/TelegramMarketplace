@@ -10,7 +10,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { generateIpReportDownload, downloadIpReport } from '@/lib/ipService';
-import ipSearchIcon from '../assets/ip_search_icon.png';
+import ipSearchIcon from '../assets/ip_check_icon.png';
 
 interface TransactionDetailsProps {
   user: User;

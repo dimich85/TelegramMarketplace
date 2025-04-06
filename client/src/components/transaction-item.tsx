@@ -2,7 +2,7 @@ import { Transaction } from '@shared/schema';
 import { format } from 'date-fns';
 import { useLocation } from 'wouter';
 import { ChevronRight } from 'lucide-react';
-import ipSearchIcon from '../assets/ip_search_icon.png';
+import ipSearchIcon from '../assets/ip_check_icon.png';
 
 interface TransactionItemProps {
   transaction: Transaction;

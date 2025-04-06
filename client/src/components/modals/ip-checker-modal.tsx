@@ -13,7 +13,7 @@ import {
   IpCheckResult,
   formatIpInput
 } from '@/lib/ipService';
-import ipSearchIcon from '../../assets/ip_search_icon.png';
+import ipSearchIcon from '../../assets/ip_check_icon.png';
 import { queryClient } from '@/lib/queryClient';
 import { Clipboard, Download } from 'lucide-react';
 

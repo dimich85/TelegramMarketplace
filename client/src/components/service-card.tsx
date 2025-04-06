@@ -2,7 +2,7 @@ import { Service } from '@shared/schema';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ipSearchIcon from '../assets/ip_search_icon.png';
+import ipSearchIcon from '../assets/ip_check_icon.png';
 
 interface ServiceCardProps {
   service: Service;
