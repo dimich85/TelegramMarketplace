@@ -82,7 +82,7 @@ export default function IpCheckerModal({
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md fixed top-[95px] max-h-[calc(100vh-150px)] overflow-y-auto">
+      <DialogContent className="sm:max-w-md fixed top-[120px] max-h-[calc(100vh-180px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Проверка IP адреса</DialogTitle>
         </DialogHeader>

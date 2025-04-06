@@ -52,4 +52,12 @@
     border-color: hsl(210, 100%, 45%) !important;
     color: hsl(210, 100%, 45%) !important;
   }
+  
+  /* Стилизация модальных окон - отступ сверху на 30px для всех модальных окон */
+  [role="dialog"] > [data-radix-popper-content-wrapper] > *:not([class*="fixed top-"]),
+  [role="alertdialog"] > [data-radix-popper-content-wrapper] > *:not([class*="fixed top-"]) {
+    top: 120px !important;
+    max-height: calc(100vh - 180px) !important;
+    overflow-y: auto !important;
+  }
 }
