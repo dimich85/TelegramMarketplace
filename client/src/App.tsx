@@ -121,7 +121,7 @@ function App() {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-gray-100 min-h-screen shadow-lg pt-[50px]"> {/* Добавлен отступ сверху для учета рамок Telegram */}
+    <div className={`max-w-lg mx-auto bg-gray-100 min-h-screen shadow-lg ${location !== '/' ? 'pt-[20px]' : ''}`}>
       {user && (
         <>
           {/* Показывать шапку только на главной странице */}

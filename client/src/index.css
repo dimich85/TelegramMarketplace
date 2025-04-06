@@ -32,10 +32,24 @@
     box-shadow: 0 0 0 2px rgb(180, 190, 200, 0.2) !important;
   }
   
-  /* Стилизация кнопок с менее закругленными краями */
+  /* Стилизация кнопок с менее закругленными краями и синим цветом */
   button, 
   .button, 
   [data-shadcn-button] {
     border-radius: 0.4rem !important;
+  }
+  
+  /* Возвращаем синий цвет только для кнопок */
+  .btn-primary,
+  [data-variant="default"][data-shadcn-button],
+  [data-shadcn-button][data-variant="default"] {
+    background-color: hsl(210, 100%, 45%) !important;
+    color: white !important;
+  }
+  
+  /* Синие границы для кнопок с обводкой */
+  [data-variant="outline"][data-shadcn-button]:hover {
+    border-color: hsl(210, 100%, 45%) !important;
+    color: hsl(210, 100%, 45%) !important;
   }
 }
