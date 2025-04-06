@@ -26,7 +26,7 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
         {isIncome ? (
           <span className="material-icons mr-3 text-gray-500">payment</span>
         ) : (
-          <img src={ipSearchIcon} alt="IP Check" className="w-6 h-6 mr-3" />
+          <img src={ipSearchIcon} alt="IP Check" className="w-12 h-12 mr-3" />
         )}
         <div>
           <p className="font-medium">{transaction.description}</p>

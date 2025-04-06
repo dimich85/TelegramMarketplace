@@ -1,6 +1,7 @@
 import React from 'react';
 import { Service } from '@shared/schema';
-import { Shield, Wifi } from 'lucide-react';
+import { Wifi } from 'lucide-react';
+import ipSearchIcon from '../assets/ip_search_icon.png';
 
 interface AssetItemProps {
   service: Service;
@@ -10,11 +11,9 @@ interface AssetItemProps {
 export default function AssetItem({ service, onSelect }: AssetItemProps) {
   // Определить иконку в зависимости от типа услуги
   const getIcon = () => {
-    if (service.name.includes('IP')) {
+    if (service.name === 'Проверка IP адреса') {
       return (
-        <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center">
-          <Shield size={20} color="white" />
-        </div>
+        <img src={ipSearchIcon} alt="IP Check" className="w-12 h-12" />
       );
     }
     return (

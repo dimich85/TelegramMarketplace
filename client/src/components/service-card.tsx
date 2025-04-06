@@ -38,8 +38,8 @@ export default function ServiceCard({
               </Badge>
             </div>
           </div>
-          {service.name.includes('IP') ? (
-            <img src={ipSearchIcon} alt="IP Check" className="w-8 h-8" />
+          {service.name === 'Проверка IP адреса' ? (
+            <img src={ipSearchIcon} alt="IP Check" className="w-16 h-16" />
           ) : (
             <span className="material-icons text-blue-600 text-2xl">{service.icon}</span>
           )}
