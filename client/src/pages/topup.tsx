@@ -14,14 +14,8 @@ export default function TopUp({ user }: TopUpProps) {
   
   return (
     <div className="pb-6">
-      {/* Заголовок страницы с кнопкой назад */}
+      {/* Заголовок страницы */}
       <div className="bg-white p-4 mb-4 flex items-center">
-        <button
-          onClick={() => setLocation('/')}
-          className="mr-4 p-2 rounded-full hover:bg-gray-100"
-        >
-          <ArrowLeft size={20} />
-        </button>
         <h1 className="text-xl font-bold">Пополнить</h1>
         
         {/* Отображение баланса */}
