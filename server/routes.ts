@@ -20,6 +20,24 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7424656286:AAH5eMP
 
 // Verify Telegram data
 function verifyTelegramWebAppData(initData: string): { [key: string]: string } {
+  // Check if we're in development mode
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+  
+  // If empty initData and in dev mode, use demo data
+  if (isDevelopment && (!initData || initData === 'demo')) {
+    console.log('Using demo Telegram data for development');
+    return {
+      user: JSON.stringify({
+        id: 12345678,
+        first_name: 'Demo',
+        last_name: 'User',
+        username: 'demo_user',
+        photo_url: 'https://t.me/i/userpic/320/demo_userpic.jpg'
+      })
+    };
+  }
+  
+  // Regular verification for production
   const urlParams = new URLSearchParams(initData);
   const hash = urlParams.get('hash');
   urlParams.delete('hash');
@@ -27,22 +45,37 @@ function verifyTelegramWebAppData(initData: string): { [key: string]: string } {
   const dataCheckArr: string[] = [];
   urlParams.sort();
   
-  for (const [key, value] of urlParams.entries()) {
+  // Использование Array.from для преобразования итератора в массив
+  Array.from(urlParams.entries()).forEach(([key, value]) => {
     dataCheckArr.push(`${key}=${value}`);
-  }
+  });
   
   const dataCheckString = dataCheckArr.join('\n');
   const secretKey = crypto.createHmac('sha256', 'WebAppData').update(TELEGRAM_BOT_TOKEN).digest();
   const calculatedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
   
   if (hash !== calculatedHash) {
+    // Also allow demo mode if hash check fails
+    if (isDevelopment) {
+      console.log('Hash verification failed, using demo data in development');
+      return {
+        user: JSON.stringify({
+          id: 12345678,
+          first_name: 'Demo',
+          last_name: 'User',
+          username: 'demo_user',
+          photo_url: 'https://t.me/i/userpic/320/demo_userpic.jpg'
+        })
+      };
+    }
     throw new Error('Invalid Telegram data');
   }
   
   const result: { [key: string]: string } = {};
-  for (const [key, value] of urlParams.entries()) {
+  // Использование Array.from для преобразования итератора в массив
+  Array.from(urlParams.entries()).forEach(([key, value]) => {
     result[key] = value;
-  }
+  });
   
   return result;
 }

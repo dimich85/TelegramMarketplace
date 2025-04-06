@@ -37,12 +37,27 @@ export function initializeTelegramApp() {
 
 export function getTelegramUser(): TelegramUser | null {
   const tgWebApp = window.Telegram?.WebApp;
+  const isDevelopment = process.env.NODE_ENV !== 'production';
   
-  if (!tgWebApp || !tgWebApp.initDataUnsafe || !tgWebApp.initDataUnsafe.user) {
-    return null;
+  // Use real Telegram user if available
+  if (tgWebApp && tgWebApp.initDataUnsafe && tgWebApp.initDataUnsafe.user) {
+    return tgWebApp.initDataUnsafe.user;
   }
   
-  return tgWebApp.initDataUnsafe.user;
+  // Use demo user in development mode if no Telegram user is available
+  if (isDevelopment) {
+    console.log('Using demo Telegram user for development');
+    return {
+      id: 12345678,
+      first_name: 'Demo',
+      last_name: 'User',
+      username: 'demo_user',
+      photo_url: 'https://t.me/i/userpic/320/demo_userpic.jpg'
+    };
+  }
+  
+  // In production, return null if no Telegram user is found
+  return null;
 }
 
 export function closeWebApp() {

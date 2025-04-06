@@ -19,20 +19,22 @@ function App() {
   const [, setLocation] = useLocation();
   const [telegramUser, setTelegramUser] = useState<any>(null);
   const { toast } = useToast();
+  const isDevelopment = import.meta.env.MODE !== 'production';
 
   // Get Telegram user info
   useEffect(() => {
     const user = getTelegramUser();
     if (user) {
       setTelegramUser(user);
-    } else {
+    } else if (!isDevelopment) {
+      // Only show error toast in production
       toast({
         title: "Ошибка аутентификации",
         description: "Приложение должно быть открыто из Telegram",
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [toast, isDevelopment]);
 
   // Authenticate user with server
   const { data: user, isLoading, error } = useQuery<User>({
@@ -40,7 +42,11 @@ function App() {
     queryFn: async () => {
       if (!telegramUser) return null;
       
-      const initData = window.Telegram?.WebApp?.initData || '';
+      // In development mode, pass 'demo' as initData to trigger the demo user
+      const initData = isDevelopment 
+        ? 'demo' 
+        : (window.Telegram?.WebApp?.initData || '');
+        
       const response = await apiRequest('POST', '/api/auth', { initData });
       return await response.json();
     },
