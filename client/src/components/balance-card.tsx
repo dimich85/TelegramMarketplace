@@ -12,7 +12,7 @@ export default function BalanceCard({ balance, onTopUp }: BalanceCardProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium text-gray-700">Баланс аккаунта</h2>
-          <span className="text-2xl font-semibold">₮</span>
+          <span className="text-2xl font-semibold">USDT</span>
         </div>
         
         <div className="flex items-baseline mt-2">

@@ -4,6 +4,7 @@ import { useLocation } from 'wouter';
 import { ChevronRight } from 'lucide-react';
 import ipSearchIcon from '../assets/ip_check_icon.png';
 import phoneIcon from '../assets/phone_check_icon.png';
+import topupIcon from '../assets/topup_icon.png';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -25,7 +26,7 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
     >
       <div className="flex items-center">
         {isIncome ? (
-          <span className="material-icons mr-3 text-gray-500">payment</span>
+          <img src={topupIcon} alt="Top Up" className="w-12 h-12 mr-3" />
         ) : transaction.description.includes('IP') ? (
           <img src={ipSearchIcon} alt="IP Check" className="w-12 h-12 mr-3" />
         ) : transaction.description.includes('телефон') ? (

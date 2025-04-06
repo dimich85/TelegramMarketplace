@@ -5,14 +5,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Badge } from "../../components/ui/badge";
-import { Label } from "../../components/ui/label";
-import { Icons } from "../../components/ui/icons";
-import { Separator } from "../../components/ui/separator";
-import { useToast } from "../../hooks/use-toast";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Icons } from "@/components/ui/icons";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import phoneCheckIcon from "../../assets/phone_check_icon.png";
 
@@ -226,7 +226,7 @@ export default function PhoneCheckerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] fixed top-[160px] max-h-[calc(100vh-220px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <img src={phoneCheckIcon} alt="Phone Check" className="w-6 h-6" />
