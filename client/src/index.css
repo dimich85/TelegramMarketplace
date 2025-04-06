@@ -8,6 +8,34 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background-color: #f5f6f8; /* Светло-серый фон с приятным оттенком */
+  }
+  
+  /* Стилизация полей ввода с менее закругленными краями и более заметной рамкой */
+  input, 
+  textarea, 
+  select,
+  .input, 
+  [data-shadcn-input] {
+    border-radius: 0.4rem !important;
+    border-width: 1.5px !important;
+    border-color: #e0e0e5 !important;
+  }
+  
+  input:focus, 
+  textarea:focus, 
+  select:focus,
+  .input:focus, 
+  [data-shadcn-input]:focus {
+    border-color: hsl(210, 15%, 60%) !important;
+    box-shadow: 0 0 0 2px rgb(180, 190, 200, 0.2) !important;
+  }
+  
+  /* Стилизация кнопок с менее закругленными краями */
+  button, 
+  .button, 
+  [data-shadcn-button] {
+    border-radius: 0.4rem !important;
   }
 }

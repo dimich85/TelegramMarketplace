@@ -70,13 +70,6 @@ export default function TopUp({ user }: TopUpProps) {
   
   return (
     <div className="pb-6">
-      {/* Отображение баланса */}
-      <div className="bg-white p-4 mb-4 flex justify-end">
-        <div className="text-right">
-          <div className="text-lg font-semibold">{user.balance.toFixed(2)} USDT</div>
-          <div className="text-xs text-gray-500">Баланс</div>
-        </div>
-      </div>
       
       <div className="px-4">
         <div className="bg-white p-5 rounded-lg shadow-sm">
