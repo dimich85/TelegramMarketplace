@@ -9,6 +9,7 @@ import Home from "@/pages/home";
 import Services from "@/pages/services";
 import Transactions from "@/pages/transactions";
 import Profile from "@/pages/profile";
+import TopUp from "@/pages/topup";
 import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 
@@ -89,6 +90,7 @@ function App() {
               <Route path="/services" component={() => <Services user={user} />} />
               <Route path="/transactions" component={() => <Transactions user={user} />} />
               <Route path="/profile" component={() => <Profile user={user} />} />
+              <Route path="/topup" component={() => <TopUp user={user} />} />
               <Route component={NotFound} />
             </Switch>
           </main>

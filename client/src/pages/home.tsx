@@ -49,14 +49,10 @@ export default function Home({ user }: HomeProps) {
 
   return (
     <div className="pb-6">
-      {/* Assets section */}
+      {/* Services section */}
       <div className="bg-white">
-        <div className="flex items-center justify-between px-4 py-3">
-          <h2 className="text-lg font-medium text-gray-600">АКТИВЫ</h2>
-          <button className="flex items-center text-blue-500 text-sm">
-            <EyeOff size={16} className="mr-1" />
-            СКРЫТЬ МЕЛКИЕ БАЛАНСЫ
-          </button>
+        <div className="px-4 py-3 text-center">
+          <h2 className="text-lg font-semibold text-gray-700">УСЛУГИ</h2>
         </div>
         
         <div className="divide-y divide-gray-100">
