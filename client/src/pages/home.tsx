@@ -51,8 +51,8 @@ export default function Home({ user }: HomeProps) {
     <div className="pb-6">
       {/* Services section */}
       <div className="bg-white">
-        <div className="px-4 py-3 text-center">
-          <h2 className="text-lg font-semibold text-gray-700">УСЛУГИ</h2>
+        <div className="px-4 py-3 text-center border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700">УСЛУГИ</h2>
         </div>
         
         <div className="divide-y divide-gray-100">
