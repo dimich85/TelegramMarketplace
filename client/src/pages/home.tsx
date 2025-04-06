@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { User, Service, Transaction } from '@shared/schema';
 import AssetItem from '@/components/asset-item';
 import IpCheckerModal from '@/components/modals/ip-checker-modal';
+import PhoneCheckerModal from '@/components/modals/phone-checker-modal';
 import TopUpModal from '@/components/modals/top-up-modal';
 import { apiRequest } from '@/lib/queryClient';
 import { EyeOff } from 'lucide-react';
@@ -14,6 +15,7 @@ interface HomeProps {
 export default function Home({ user }: HomeProps) {
   const [showTopUpModal, setShowTopUpModal] = useState(false);
   const [showIpCheckerModal, setShowIpCheckerModal] = useState(false);
+  const [showPhoneCheckerModal, setShowPhoneCheckerModal] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
 
   // Fetch services
@@ -35,14 +37,20 @@ export default function Home({ user }: HomeProps) {
   };
 
   const handleBuyService = (serviceId: number) => {
-    // If it's the IP checking service, open the modal
+    // Находим услугу по ID
     const service = services.find(s => s.id === serviceId);
-    if (service && service.name.includes('IP')) {
-      setSelectedServiceId(serviceId);
+    if (!service) return;
+    
+    // Сохраняем ID выбранной услуги
+    setSelectedServiceId(serviceId);
+    
+    // Определяем тип услуги по названию и открываем соответствующее модальное окно
+    if (service.name.includes('IP')) {
       setShowIpCheckerModal(true);
+    } else if (service.name.includes('телефон')) {
+      setShowPhoneCheckerModal(true);
     } else {
-      // Otherwise, proceed with direct purchase
-      // This would be implemented for the VPN service
+      // Для других типов услуг (если будут добавлены в будущем)
       console.log('Buy service', serviceId);
     }
   };
@@ -76,6 +84,13 @@ export default function Home({ user }: HomeProps) {
       <IpCheckerModal 
         isOpen={showIpCheckerModal} 
         onClose={() => setShowIpCheckerModal(false)}
+        userId={user.id}
+        serviceId={selectedServiceId}
+      />
+      
+      <PhoneCheckerModal 
+        isOpen={showPhoneCheckerModal} 
+        onClose={() => setShowPhoneCheckerModal(false)}
         userId={user.id}
         serviceId={selectedServiceId}
       />

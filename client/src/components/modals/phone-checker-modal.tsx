@@ -226,7 +226,7 @@ export default function PhoneCheckerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px] fixed top-[160px] max-h-[calc(100vh-220px)] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] fixed top-[180px] max-h-[calc(100vh-240px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <img src={phoneCheckIcon} alt="Phone Check" className="w-6 h-6" />
