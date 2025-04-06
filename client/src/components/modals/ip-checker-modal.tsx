@@ -13,7 +13,7 @@ import {
   formatIpInput
 } from '@/lib/ipService';
 import { queryClient } from '@/lib/queryClient';
-import { Clipboard } from 'lucide-react';
+import { Clipboard, Download } from 'lucide-react';
 
 interface IpCheckerModalProps {
   isOpen: boolean;
@@ -58,15 +58,43 @@ export default function IpCheckerModal({
       queryClient.invalidateQueries({ queryKey: ['/api/auth'] });
       queryClient.invalidateQueries({ queryKey: ['/api/transactions'] });
       
-      // Закрываем модальное окно и перенаправляем на страницу с деталями транзакции
-      // Получаем ID последней транзакции из результата
-      const lastTransactionId = result.ipCheck.id;
-      onClose();
-      navigate(`/transaction/${lastTransactionId}`);
+      // Получаем transactionId из результата
+      const transactionId = result.transactionId;
       
+      // Закрываем модальное окно и перенаправляем на страницу с деталями транзакции
+      onClose();
+      
+      // Проверяем, что транзакция действительно существует, и только потом перенаправляем
+      // с ожиданием для уверенности, что данные созданы на сервере
+      const checkAndNavigate = async () => {
+        try {
+          // Даем серверу время создать и сохранить транзакцию
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Пробуем получить транзакцию
+          const response = await fetch(`/api/transactions/${transactionId}`);
+          if (response.ok) {
+            // Транзакция создана, можно перенаправлять
+            navigate(`/transaction/${transactionId}`);
+          } else {
+            // Если не получилось, пробуем еще раз через секунду
+            setTimeout(checkAndNavigate, 1000);
+          }
+        } catch (err) {
+          // В случае ошибки тоже пробуем еще раз
+          setTimeout(checkAndNavigate, 1000);
+        }
+      };
+      
+      checkAndNavigate();
+      
+      // Показываем уведомление об успешной транзакции
       toast({
-        title: "Проверка выполнена",
+        title: "✓ Выполнено",
         description: "IP адрес успешно проверен",
+        variant: "default",
+        duration: 2000, // 2 секунды
+        className: "bg-green-50 border-green-200 text-green-800", // Салатовый фон
       });
     } catch (error) {
       toast({
@@ -264,7 +292,8 @@ export default function IpCheckerModal({
                 className="mt-4 w-full"
                 onClick={handleSaveReport}
               >
-                Сохранить отчет
+                <Download className="w-4 h-4 mr-2" />
+                Сохранить подробный отчет
               </Button>
             </div>
           )}

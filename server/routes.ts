@@ -349,7 +349,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newBalance = user.balance - ipService.price;
       await storage.updateUserBalance(user.id, newBalance);
       
-      await storage.createTransaction({
+      // Создаем транзакцию и получаем ее ID для передачи на клиент
+      const transaction = await storage.createTransaction({
         userId: user.id,
         type: 'purchase',
         amount: ipService.price,
@@ -359,7 +360,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       return res.status(200).json({
         ipCheck,
-        userBalance: newBalance
+        userBalance: newBalance,
+        transactionId: transaction.id // Добавляем ID транзакции в ответ
       });
     } catch (error) {
       console.error('IP check error:', error);

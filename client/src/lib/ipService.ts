@@ -14,6 +14,7 @@ export interface IpCheckResult {
     createdAt: string;
   };
   userBalance: number;
+  transactionId: number; // ID связанной транзакции
 }
 
 /**

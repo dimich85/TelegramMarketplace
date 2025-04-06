@@ -94,7 +94,8 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
         details: ipCheck.details || {},
         createdAt: typeof ipCheck.createdAt === 'string' ? ipCheck.createdAt : ipCheck.createdAt.toISOString()
       },
-      userBalance: user.balance
+      userBalance: user.balance,
+      transactionId: parseInt(transactionId || '0', 10)
     };
     
     const downloadUrl = generateIpReportDownload(ipCheckForReport);
@@ -241,7 +242,7 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
                   onClick={handleDownloadReport}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Сохранить отчет
+                  Сохранить подробный отчет
                 </Button>
               </div>
             )}
