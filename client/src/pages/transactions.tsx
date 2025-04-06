@@ -88,32 +88,7 @@ export default function Transactions({ user }: TransactionsProps) {
           </div>
         )}
         
-        {/* Export Button */}
-        {transactions.length > 0 && (
-          <button 
-            className="mt-4 w-full py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-            onClick={() => {
-              // Generate a CSV of transactions
-              const headers = "ID,Тип,Сумма,Описание,Дата\n";
-              const csvContent = transactions.reduce((acc, t) => {
-                const date = new Date(t.createdAt).toLocaleString('ru-RU');
-                const amount = t.type === 'topup' ? `+${t.amount}` : `-${t.amount}`;
-                return acc + `${t.id},${t.type},${amount},${t.description},${date}\n`;
-              }, headers);
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.setAttribute('download', 'transactions.csv');
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-          >
-            Экспорт истории
-          </button>
-        )}
+        {/* Removed export button as per request */}
       </div>
     </div>
   );
