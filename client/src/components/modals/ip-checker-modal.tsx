@@ -90,11 +90,11 @@ export default function IpCheckerModal({
       
       // Показываем уведомление об успешной транзакции
       toast({
-        title: "✓ Выполнено",
-        description: "IP адрес успешно проверен",
+        title: "🎉 Выполнено",
+        description: "",
         variant: "default",
         duration: 2000, // 2 секунды
-        className: "bg-green-50 border-green-200 text-green-800", // Салатовый фон
+        className: "bg-green-50 border-green-200 text-gray-800 py-1 px-2 text-center text-sm", // Компактное уведомление
       });
     } catch (error) {
       toast({
@@ -165,16 +165,30 @@ export default function IpCheckerModal({
     
     const downloadUrl = generateIpReportDownload(ipCheckResult);
     
-    // Create an anchor element and trigger download
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = `ip_report_${ipCheckResult.ipCheck.ipAddress}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Проверка если это мобильное устройство
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    // Clean up the URL object
-    URL.revokeObjectURL(downloadUrl);
+    if (isMobile) {
+      // Для мобильных устройств открываем файл в новом окне
+      window.open(downloadUrl, '_blank');
+      
+      // Очистим URL-объект через некоторое время
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+      }, 5000);
+    } else {
+      // Для десктопа используем стандартное скачивание
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `ip_report_${ipCheckResult.ipCheck.ipAddress}.txt`;
+      a.target = '_blank'; // Добавляем target="_blank" для открытия в новом окне
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Очистим URL-объект
+      URL.revokeObjectURL(downloadUrl);
+    }
   };
   
   return (

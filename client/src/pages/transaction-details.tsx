@@ -100,21 +100,35 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
     
     const downloadUrl = generateIpReportDownload(ipCheckForReport);
     
-    // Create an anchor element and trigger download
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = `ip_report_${ipCheck.ipAddress}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Проверка если это мобильное устройство
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    // Clean up the URL object
-    URL.revokeObjectURL(downloadUrl);
+    if (isMobile) {
+      // Для мобильных устройств открываем файл в новом окне
+      window.open(downloadUrl, '_blank');
+      
+      // Очистим URL-объект через некоторое время
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+      }, 5000);
+    } else {
+      // Для десктопа используем стандартное скачивание
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `ip_report_${ipCheck.ipAddress}.txt`;
+      a.target = '_blank'; // Добавляем target="_blank" для открытия в новом окне
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Очистим URL-объект
+      URL.revokeObjectURL(downloadUrl);
+    }
   };
   
   return (
     <div className="pb-6 px-4">
-      <div className="mb-4">
+      <div className="mb-4 text-center">
         <h1 className="text-xl font-semibold">Детали транзакции</h1>
       </div>
       
@@ -140,51 +154,9 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
         
         <CardContent>
           <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Тип операции</h3>
-              <p className="font-medium">
-                {isIncome ? 'Пополнение баланса' : 'Покупка услуги'}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Дата и время</h3>
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                <p>{formattedDate}</p>
-              </div>
-            </div>
-            
-            {isIncome && transaction.reference && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Номер платежа</h3>
-                <div className="flex items-center">
-                  <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
-                  <p>{transaction.reference}</p>
-                </div>
-              </div>
-            )}
-            
-            {!isIncome && service && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Услуга</h3>
-                <div className="flex items-center">
-                  <span className="material-icons mr-2 text-gray-500">
-                    {service.icon}
-                  </span>
-                  <div>
-                    <p className="font-medium">{service.name}</p>
-                    <p className="text-sm text-gray-500">{service.description}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             {/* IP Check Results Section */}
             {ipCheck && (
-              <div className="mt-6 border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Результаты проверки IP</h3>
-                
+              <div>
                 <div className="bg-gray-50 rounded-lg p-3 mb-3">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="text-gray-600">IP адрес:</div>
@@ -235,22 +207,22 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
                     return null;
                   })()}
                 </div>
-                
-                <Button 
-                  variant="outline"
-                  className="mt-4 w-full"
-                  onClick={handleDownloadReport}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Сохранить подробный отчет
-                </Button>
               </div>
             )}
           </div>
         </CardContent>
         
         <CardFooter className="border-t pt-4">
-          {/* Кнопка удалена по требованию */}
+          {ipCheck && (
+            <Button 
+              variant="outline"
+              className="w-full"
+              onClick={handleDownloadReport}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Сохранить подробный отчет
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>
