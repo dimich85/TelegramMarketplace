@@ -12,8 +12,7 @@ import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 
-import Header from "@/components/layout/header";
-import NavigationBar from "@/components/layout/navigation-bar";
+import AppHeader from "@/components/layout/app-header";
 
 function App() {
   const [, setLocation] = useLocation();
@@ -55,21 +54,21 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-telegram-light">
-        <div className="animate-spin h-10 w-10 border-4 border-telegram-blue rounded-full border-t-transparent"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
       </div>
     );
   }
 
   if (error || (!isLoading && !user && telegramUser)) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-telegram-light p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
         <h1 className="text-2xl font-bold text-red-600 mb-2">Ошибка аутентификации</h1>
         <p className="text-center text-gray-700">
           Не удалось аутентифицировать пользователя. Пожалуйста, попробуйте еще раз.
         </p>
         <button 
-          className="mt-4 px-4 py-2 bg-telegram-blue text-white rounded"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
           onClick={() => window.location.reload()}
         >
           Обновить
@@ -79,12 +78,12 @@ function App() {
   }
 
   return (
-    <div className="max-w-lg mx-auto bg-white min-h-screen shadow-lg">
+    <div className="max-w-lg mx-auto bg-gray-100 min-h-screen shadow-lg">
       {user && (
         <>
-          <Header user={user} />
+          <AppHeader user={user} onNavigate={(path) => setLocation(path)} />
           
-          <main className="p-4 pb-20">
+          <main>
             <Switch>
               <Route path="/" component={() => <Home user={user} />} />
               <Route path="/services" component={() => <Services user={user} />} />
@@ -93,8 +92,6 @@ function App() {
               <Route component={NotFound} />
             </Switch>
           </main>
-          
-          <NavigationBar onNavigate={(path) => setLocation(path)} />
         </>
       )}
     </div>

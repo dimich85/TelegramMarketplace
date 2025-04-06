@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { User, Service, Transaction } from '@shared/schema';
-import BalanceCard from '@/components/balance-card';
-import ServiceCard from '@/components/service-card';
-import TransactionItem from '@/components/transaction-item';
+import AssetItem from '@/components/asset-item';
 import IpCheckerModal from '@/components/modals/ip-checker-modal';
 import TopUpModal from '@/components/modals/top-up-modal';
 import { apiRequest } from '@/lib/queryClient';
-import { Link } from 'wouter';
+import { EyeOff } from 'lucide-react';
 
 interface HomeProps {
   user: User;
@@ -50,50 +48,27 @@ export default function Home({ user }: HomeProps) {
   };
 
   return (
-    <>
-      <BalanceCard 
-        balance={user.balance} 
-        onTopUp={handleTopUp} 
-      />
-      
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Услуги</h2>
+    <div className="pb-6">
+      {/* Assets section */}
+      <div className="bg-white">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h2 className="text-lg font-medium text-gray-600">АКТИВЫ</h2>
+          <button className="flex items-center text-blue-500 text-sm">
+            <EyeOff size={16} className="mr-1" />
+            СКРЫТЬ МЕЛКИЕ БАЛАНСЫ
+          </button>
+        </div>
         
-        <div className="space-y-4">
+        <div className="divide-y divide-gray-100">
           {services.map(service => (
-            <ServiceCard 
+            <AssetItem 
               key={service.id}
               service={service}
-              onBuy={() => handleBuyService(service.id)}
-              userBalance={user.balance}
+              onSelect={() => handleBuyService(service.id)}
             />
           ))}
         </div>
-      </section>
-
-      <section className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">История</h2>
-          <Link 
-            to="/transactions"
-            className="text-sm text-blue-600 flex items-center"
-          >
-            Все <span className="material-icons text-sm ml-1">chevron_right</span>
-          </Link>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-100">
-          {transactions.length > 0 ? (
-            transactions.slice(0, 3).map(transaction => (
-              <TransactionItem key={transaction.id} transaction={transaction} />
-            ))
-          ) : (
-            <div className="py-6 px-4 text-center">
-              <p className="text-gray-500">У вас пока нет транзакций</p>
-            </div>
-          )}
-        </div>
-      </section>
+      </div>
 
       {/* Modals */}
       <TopUpModal 
@@ -108,6 +83,6 @@ export default function Home({ user }: HomeProps) {
         userId={user.id}
         serviceId={selectedServiceId}
       />
-    </>
+    </div>
   );
 }
