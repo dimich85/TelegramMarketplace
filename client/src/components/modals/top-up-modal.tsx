@@ -73,7 +73,7 @@ export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps)
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md fixed top-[140px] max-h-[calc(100vh-200px)] overflow-y-auto">
+      <DialogContent className="sm:max-w-md fixed top-[160px] max-h-[calc(100vh-220px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Пополнение баланса</DialogTitle>
         </DialogHeader>

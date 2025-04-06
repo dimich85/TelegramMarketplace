@@ -53,11 +53,11 @@
     color: hsl(210, 100%, 45%) !important;
   }
   
-  /* Стилизация модальных окон - отступ сверху на 40px для всех модальных окон */
+  /* Стилизация модальных окон - отступ сверху на 60px для всех модальных окон */
   [role="dialog"] > [data-radix-popper-content-wrapper] > *:not([class*="fixed top-"]),
   [role="alertdialog"] > [data-radix-popper-content-wrapper] > *:not([class*="fixed top-"]) {
-    top: 140px !important;
-    max-height: calc(100vh - 200px) !important;
+    top: 160px !important;
+    max-height: calc(100vh - 220px) !important;
     overflow-y: auto !important;
   }
 }
