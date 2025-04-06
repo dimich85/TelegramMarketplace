@@ -79,25 +79,54 @@ export default function IpCheckerModal({
     setIpAddress(formattedValue);
   };
   
-  // Улучшенная функция вставки из буфера обмена
+  // Улучшенная функция вставки из буфера обмена с поддержкой мобильных устройств
   const handlePaste = async () => {
     try {
-      // Получаем текст из буфера обмена
-      let text = await navigator.clipboard.readText();
+      let text;
       
-      // Сразу форматируем текст
-      text = formatIpInput(text);
+      // Проверяем, поддерживается ли Clipboard API
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        text = await navigator.clipboard.readText();
+      } else {
+        // Альтернативный метод для мобильных устройств
+        // Фокусируемся на поле ввода и программно вызываем команду вставки
+        if (inputRef.current) {
+          inputRef.current.focus();
+          
+          // Создаем и вызываем событие paste
+          document.execCommand('paste');
+          
+          // Получаем текущее значение поля после вставки
+          text = inputRef.current.value;
+        }
+      }
       
-      // Устанавливаем отформатированное значение
-      setIpAddress(text);
+      if (text) {
+        // Сразу форматируем текст
+        const formattedText = formatIpInput(text);
+        
+        // Устанавливаем отформатированное значение
+        setIpAddress(formattedText);
+      }
       
       // Фокусируемся на поле ввода
       if (inputRef.current) {
         inputRef.current.focus();
       }
     } catch (error) {
-      // В случае ошибки доступа к буферу обмена, продолжаем без уведомления
+      // В случае ошибки доступа к буферу обмена, показываем сообщение
       console.error("Clipboard error:", error);
+      
+      toast({
+        title: "Вставьте вручную",
+        description: "Используйте долгое нажатие + вставить на поле ввода",
+        variant: "default",
+      });
+      
+      // Фокусируемся на поле ввода для удобства ручной вставки
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
   };
   
@@ -135,7 +164,7 @@ export default function IpCheckerModal({
               <Label htmlFor="ipAddress" className="block text-sm font-medium text-gray-700 mb-1">
                 IP адрес
               </Label>
-              <div className="flex">
+              <div className="flex space-x-2">
                 <Input 
                   type="text" 
                   id="ipAddress" 
@@ -144,16 +173,16 @@ export default function IpCheckerModal({
                   onChange={handleIpInputChange}
                   ref={inputRef}
                   required
-                  className="rounded-r-none border-r-0"
-                  inputMode="numeric"
+                  className="rounded"
+                  pattern="[0-9.]+"
+                  inputMode="decimal"
                 />
                 <Button
                   type="button"
                   onClick={handlePaste}
-                  className="rounded-l-none border-l-0 bg-white hover:bg-gray-50"
-                  variant="outline"
+                  className="min-w-[44px] px-3"
                 >
-                  <Clipboard className="h-4 w-4 text-gray-500" />
+                  <Clipboard className="h-4 w-4" />
                 </Button>
               </div>
               <p className="text-xs text-gray-500 mt-1">
