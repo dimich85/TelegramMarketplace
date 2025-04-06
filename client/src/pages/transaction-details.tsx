@@ -67,7 +67,23 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
   const handleDownloadReport = () => {
     if (!ipCheck) return;
     
-    const downloadUrl = generateIpReportDownload({ ipCheck, userBalance: user.balance });
+    // Преобразуем формат ipCheck для соответствия IpCheckResult
+    const ipCheckForReport = {
+      ipCheck: {
+        ...ipCheck,
+        // Преобразуем поля, чтобы они соответствовали ожидаемым типам в IpCheckResult
+        country: ipCheck.country || '',
+        city: ipCheck.city || '',
+        isp: ipCheck.isp || '',
+        isSpam: ipCheck.isSpam === null ? false : ipCheck.isSpam,
+        isBlacklisted: ipCheck.isBlacklisted === null ? false : ipCheck.isBlacklisted,
+        details: ipCheck.details || {},
+        createdAt: typeof ipCheck.createdAt === 'string' ? ipCheck.createdAt : ipCheck.createdAt.toISOString()
+      },
+      userBalance: user.balance
+    };
+    
+    const downloadUrl = generateIpReportDownload(ipCheckForReport);
     
     // Create an anchor element and trigger download
     const a = document.createElement('a');
@@ -194,10 +210,10 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
                       {ipCheck.isSpam ? 'Обнаружен в спам-базах' : 'Не обнаружен в спам-базах'}
                     </span>
                   </div>
-                  {ipCheck.details?.hostname && (
+                  {ipCheck.details && 'hostname' in ipCheck.details && (
                     <div className="flex items-center">
                       <span className="material-icons text-yellow-500 mr-2">info</span>
-                      <span>{ipCheck.details.hostname}</span>
+                      <span>{(ipCheck.details as any).hostname}</span>
                     </div>
                   )}
                 </div>

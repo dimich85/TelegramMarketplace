@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 import { 
   checkIpAddress, 
   isValidIpAddress, 
@@ -32,6 +33,7 @@ export default function IpCheckerModal({
   const [ipCheckResult, setIpCheckResult] = useState<IpCheckResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   
   const handleIpCheck = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +57,12 @@ export default function IpCheckerModal({
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/auth'] });
       queryClient.invalidateQueries({ queryKey: ['/api/transactions'] });
+      
+      // Закрываем модальное окно и перенаправляем на страницу с деталями транзакции
+      // Получаем ID последней транзакции из результата
+      const lastTransactionId = result.ipCheck.id;
+      onClose();
+      navigate(`/transaction/${lastTransactionId}`);
       
       toast({
         title: "Проверка выполнена",
@@ -183,27 +191,13 @@ export default function IpCheckerModal({
                     type="button"
                     onClick={handlePaste}
                     className="min-w-[44px] px-3"
+                    variant="outline"
                   >
                     <Clipboard className="h-4 w-4" />
                   </Button>
                 </div>
                 
-                {/* Добавляем виртуальную клавиатуру с точкой для мобильных устройств */}
-                <div className="flex justify-center mt-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-9 px-6 text-lg"
-                    onClick={() => {
-                      setIpAddress(prev => prev + '.');
-                      if (inputRef.current) {
-                        inputRef.current.focus();
-                      }
-                    }}
-                  >
-                    Добавить точку (.)
-                  </Button>
-                </div>
+
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Формат: IPv4 (например, 192.168.1.1)

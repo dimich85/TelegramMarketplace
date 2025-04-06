@@ -68,7 +68,7 @@ export class MemStorage implements IStorage {
     const ipCheckService: InsertService = {
       name: "Проверка IP адреса",
       description: "Проверка IP на спам, блэклисты и определение геоданных",
-      price: 5.0,
+      price: 0.2,
       icon: "public",
       available: true,
     };
@@ -76,7 +76,7 @@ export class MemStorage implements IStorage {
     const vpnService: InsertService = {
       name: "VPN Подписка",
       description: "1 месяц анонимного доступа в интернет с защитой данных",
-      price: 20.0,
+      price: 0.5,
       icon: "vpn_lock",
       available: true,
     };
@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
       const ipCheckTransaction: InsertTransaction = {
         userId: user.id,
         type: 'purchase',
-        amount: 5.0,
+        amount: 0.2,
         description: 'Проверка IP адреса',
         reference: null,
         serviceId: 1,
@@ -130,7 +130,7 @@ export class MemStorage implements IStorage {
       const vpnTransaction: InsertTransaction = {
         userId: user.id,
         type: 'purchase',
-        amount: 20.0,
+        amount: 0.5,
         description: 'VPN Подписка (1 месяц)',
         reference: null,
         serviceId: 2,
@@ -156,8 +156,8 @@ export class MemStorage implements IStorage {
       createDelayedTransaction(ipCheckTransaction, 5); // 5 дней назад
       createDelayedTransaction(vpnTransaction, 2); // 2 дня назад
       
-      // Обновляем баланс пользователя (50 - 5 - 20 = 25)
-      this.updateUserBalance(user.id, 25.0);
+      // Обновляем баланс пользователя (50 - 0.2 - 0.5 = 49.3)
+      this.updateUserBalance(user.id, 49.3);
       
       // Добавляем результат проверки IP
       const ipCheckResult: InsertIpCheck = {
