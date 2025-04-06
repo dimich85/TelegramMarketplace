@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Transaction } from '@shared/schema';
 import TransactionItem from '@/components/transaction-item';
 import { apiRequest } from '@/lib/queryClient';
@@ -12,6 +13,16 @@ interface TransactionsProps {
 
 export default function Transactions({ user }: TransactionsProps) {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  
+  // При монтировании компонента инвалидируем запросы для обновления данных во всем приложении
+  useEffect(() => {
+    // Инвалидировать все основные запросы для обновления данных
+    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/auth'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/services'] });
+  }, [queryClient]);
 
   // Fetch transactions
   const { data: transactions = [], isLoading, error } = useQuery<Transaction[]>({
@@ -20,6 +31,10 @@ export default function Transactions({ user }: TransactionsProps) {
       const response = await apiRequest('GET', `/api/transactions?userId=${user.id}`);
       return await response.json();
     },
+    // Перезагружаем данные при каждом показе компонента
+    refetchOnMount: true,
+    // Отключаем кеширование, чтобы всегда получать новые данные
+    staleTime: 0
   });
 
   // Group transactions by date

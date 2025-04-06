@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Service } from '@shared/schema';
 import ServiceCard from '@/components/service-card';
 import IpCheckerModal from '@/components/modals/ip-checker-modal';
@@ -14,10 +14,24 @@ export default function Services({ user }: ServicesProps) {
   const [showIpCheckerModal, setShowIpCheckerModal] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  
+  // При монтировании компонента инвалидируем запросы для обновления данных во всем приложении
+  useEffect(() => {
+    // Инвалидировать все основные запросы для обновления данных
+    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/auth'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/services'] });
+  }, [queryClient]);
 
   // Fetch services
   const { data: services = [], isLoading, error } = useQuery<Service[]>({
     queryKey: ['/api/services'],
+    // Перезагружаем данные при каждом показе компонента
+    refetchOnMount: true,
+    // Отключаем кеширование, чтобы всегда получать новые данные
+    staleTime: 0
   });
 
   const handleBuyService = (serviceId: number) => {
@@ -56,8 +70,8 @@ export default function Services({ user }: ServicesProps) {
         
         {/* Отображение баланса */}
         <div className="ml-auto text-right">
-          <div className="text-lg font-semibold">{user.balance.toFixed(2)} USDT</div>
-          <div className="text-xs text-gray-500">Баланс</div>
+          <div className="text-lg font-semibold">{user.balance.toFixed(2)} ₮</div>
+          <div className="text-xs text-gray-500">Баланс в USDT</div>
         </div>
       </div>
       

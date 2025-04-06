@@ -38,15 +38,42 @@ function App() {
     }
   }, [toast, isDevelopment]);
 
+  // Храним историю перемещений для поддержки кнопки Назад
+  const [navigationHistory, setNavigationHistory] = useState<string[]>(['/']);
+  
+  // Отслеживаем историю перемещений
+  useEffect(() => {
+    // Добавляем текущее местоположение в историю, если оно отличается от последнего
+    if (location !== navigationHistory[navigationHistory.length - 1]) {
+      setNavigationHistory(prev => [...prev, location]);
+    }
+  }, [location, navigationHistory]);
+  
+  // Функция для возврата на предыдущую страницу
+  const goBack = () => {
+    if (navigationHistory.length > 1) {
+      // Удаляем текущее местоположение из истории
+      const newHistory = [...navigationHistory];
+      newHistory.pop();
+      
+      // Переходим на предыдущее местоположение
+      const previousLocation = newHistory[newHistory.length - 1];
+      setLocation(previousLocation);
+      
+      // Обновляем историю
+      setNavigationHistory(newHistory);
+    }
+  };
+  
   // Setup back button handling
   useEffect(() => {
     // Show back button when not on home page
     if (location !== '/') {
       showBackButton();
       
-      // Configure back button handler
+      // Configure back button handler to go back to previous page
       onBackButtonClicked(() => {
-        setLocation('/');
+        goBack();
       });
     } else {
       hideBackButton();
@@ -56,7 +83,7 @@ function App() {
     return () => {
       hideBackButton();
     };
-  }, [location, setLocation]);
+  }, [location, setLocation, navigationHistory]);
 
   // Authenticate user with server
   const { data: user, isLoading, error } = useQuery<User>({

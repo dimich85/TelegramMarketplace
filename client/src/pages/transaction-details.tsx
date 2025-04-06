@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useRoute } from 'wouter';
 import { Transaction, User, Service, IpCheck } from '@shared/schema';
 import { ArrowLeft, Calendar, CreditCard, Info, Download } from 'lucide-react';
@@ -25,6 +25,16 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
   const [, navigate] = useLocation();
   const [, params] = useRoute('/transaction/:id');
   const transactionId = params?.id;
+  const queryClient = useQueryClient();
+  
+  // При монтировании компонента инвалидируем запросы для обновления данных во всем приложении
+  useEffect(() => {
+    // Инвалидировать все основные запросы для обновления данных
+    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/auth'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/services'] });
+  }, [queryClient]);
   
   // Запрос данных о транзакции
   const { data, isLoading, error } = useQuery<TransactionDetailsResponse>({
@@ -34,6 +44,10 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
       return await response.json();
     },
     enabled: !!transactionId,
+    // Перезагружаем данные при каждом показе компонента
+    refetchOnMount: true,
+    // Отключаем кеширование, чтобы всегда получать новые данные
+    staleTime: 0
   });
   
   if (isLoading) {
@@ -99,14 +113,7 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
   
   return (
     <div className="pb-6 px-4">
-      <div className="flex items-center mb-4">
-        <Button 
-          variant="ghost" 
-          className="p-0 mr-2"
-          onClick={() => navigate('/transactions')}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+      <div className="mb-4">
         <h1 className="text-xl font-semibold">Детали транзакции</h1>
       </div>
       
@@ -210,12 +217,22 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
                       {ipCheck.isSpam ? 'Обнаружен в спам-базах' : 'Не обнаружен в спам-базах'}
                     </span>
                   </div>
-                  {ipCheck.details && 'hostname' in ipCheck.details && (
-                    <div className="flex items-center">
-                      <span className="material-icons text-yellow-500 mr-2">info</span>
-                      <span>{(ipCheck.details as any).hostname}</span>
-                    </div>
-                  )}
+                  {(() => {
+                    if (ipCheck.details && 
+                       typeof ipCheck.details === 'object' && 
+                       ipCheck.details !== null) {
+                      const details = ipCheck.details as Record<string, unknown>;
+                      if ('hostname' in details && typeof details.hostname === 'string') {
+                        return (
+                          <div className="flex items-center">
+                            <span className="material-icons text-yellow-500 mr-2">info</span>
+                            <span>{details.hostname}</span>
+                          </div>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
                 </div>
                 
                 <Button 
@@ -232,14 +249,7 @@ export default function TransactionDetails({ user }: TransactionDetailsProps) {
         </CardContent>
         
         <CardFooter className="border-t pt-4">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => navigate('/transactions')}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Вернуться к истории
-          </Button>
+          {/* Кнопка удалена по требованию */}
         </CardFooter>
       </Card>
     </div>
