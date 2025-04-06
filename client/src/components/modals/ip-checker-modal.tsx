@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { checkIpAddress, isValidIpAddress, generateIpReportDownload, IpCheckResult } from '@/lib/ipService';
 import { queryClient } from '@/lib/queryClient';
+import { Clipboard } from 'lucide-react';
 
 interface IpCheckerModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export default function IpCheckerModal({
   const [ipAddress, setIpAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ipCheckResult, setIpCheckResult] = useState<IpCheckResult | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const handleIpCheck = async (e: React.FormEvent) => {
@@ -63,6 +65,44 @@ export default function IpCheckerModal({
     }
   };
   
+  // Функция валидации ввода (только цифры и точки)
+  const handleIpInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Заменяем все символы, кроме цифр и точек
+    const sanitizedValue = value.replace(/[^0-9.]/g, '');
+    setIpAddress(sanitizedValue);
+  };
+  
+  // Функция вставки из буфера обмена
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      
+      // Проверяем, содержит ли текст правильный формат IP
+      const ipRegex = /^[\d.]+$/;
+      if (!ipRegex.test(text)) {
+        toast({
+          title: "Неверный формат",
+          description: "Скопированный текст не содержит корректный IP адрес (только цифры и точки)",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Устанавливаем значение и фокусируемся на поле ввода
+      setIpAddress(text);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка вставки",
+        description: "Не удалось получить доступ к буферу обмена",
+        variant: "destructive",
+      });
+    }
+  };
+  
   const handleSaveReport = () => {
     if (!ipCheckResult) return;
     
@@ -97,14 +137,30 @@ export default function IpCheckerModal({
               <Label htmlFor="ipAddress" className="block text-sm font-medium text-gray-700 mb-1">
                 IP адрес
               </Label>
-              <Input 
-                type="text" 
-                id="ipAddress" 
-                placeholder="Например: 8.8.8.8"
-                value={ipAddress}
-                onChange={(e) => setIpAddress(e.target.value)}
-                required
-              />
+              <div className="flex">
+                <Input 
+                  type="text" 
+                  id="ipAddress" 
+                  placeholder="Например: 8.8.8.8"
+                  value={ipAddress}
+                  onChange={handleIpInputChange}
+                  ref={inputRef}
+                  required
+                  className="rounded-r-none"
+                />
+                <Button
+                  type="button"
+                  onClick={handlePaste}
+                  className="rounded-l-none px-3"
+                  variant="outline"
+                  title="Вставить из буфера обмена"
+                >
+                  <Clipboard className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Допускаются только цифры и точки
+              </p>
             </div>
             
             <Button 

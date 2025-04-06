@@ -169,6 +169,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get transaction details
+  app.get('/api/transactions/:id', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return res.status(400).json({ message: 'Transaction ID is required' });
+      }
+      
+      const transaction = await storage.getTransaction(parseInt(id));
+      
+      if (!transaction) {
+        return res.status(404).json({ message: 'Transaction not found' });
+      }
+      
+      // Если это покупка услуги, получаем информацию о сервисе
+      let service = null;
+      if (transaction.type === 'purchase' && transaction.serviceId) {
+        service = await storage.getService(transaction.serviceId);
+      }
+      
+      // Если это услуга проверки IP, получаем связанную проверку IP
+      let ipCheck = null;
+      if (transaction.serviceId === 1) { // ID сервиса проверки IP
+        const ipChecks = await storage.getUserIpChecks(transaction.userId);
+        // Находим проверку IP, которая совпадает по времени с транзакцией (с точностью до минуты)
+        ipCheck = ipChecks.find(check => {
+          const transactionTime = new Date(transaction.createdAt).getTime();
+          const ipCheckTime = new Date(check.createdAt).getTime();
+          // Находим проверки в пределах 5 минут от транзакции
+          return Math.abs(transactionTime - ipCheckTime) < 5 * 60 * 1000;
+        });
+      }
+      
+      return res.status(200).json({ transaction, service, ipCheck });
+    } catch (error) {
+      console.error('Get transaction details error:', error);
+      return res.status(500).json({ message: 'Failed to retrieve transaction details' });
+    }
+  });
+  
   // Top-up routes with CryptoCloud integration
   app.post('/api/topup/create', async (req: Request, res: Response) => {
     try {

@@ -8,6 +8,7 @@ import { apiRequest } from "./lib/queryClient";
 import Home from "@/pages/home";
 import Services from "@/pages/services";
 import Transactions from "@/pages/transactions";
+import TransactionDetails from "@/pages/transaction-details";
 import Profile from "@/pages/profile";
 import TopUp from "@/pages/topup";
 import NotFound from "@/pages/not-found";
@@ -103,21 +104,31 @@ function App() {
   const renderContent = () => {
     if (!user) return null;
 
-    // Отображение только соответствующего контента в зависимости от маршрута
-    switch (location) {
-      case '/services':
-        return <Services user={user} />;
-      case '/transactions':
-        return <Transactions user={user} />;
-      case '/profile':
-        return <Profile user={user} />;
-      case '/topup':
-        return <TopUp user={user} />;
-      case '/':
-        return <Home user={user} />;
-      default:
-        return <NotFound />;
-    }
+    return (
+      <Switch>
+        <Route path="/services">
+          <Services user={user} />
+        </Route>
+        <Route path="/transactions">
+          <Transactions user={user} />
+        </Route>
+        <Route path="/transaction/:id">
+          <TransactionDetails user={user} />
+        </Route>
+        <Route path="/profile">
+          <Profile user={user} />
+        </Route>
+        <Route path="/topup">
+          <TopUp user={user} />
+        </Route>
+        <Route path="/">
+          <Home user={user} />
+        </Route>
+        <Route>
+          <NotFound />
+        </Route>
+      </Switch>
+    );
   };
 
   return (

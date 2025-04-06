@@ -59,6 +59,9 @@ export class MemStorage implements IStorage {
     
     // Initialize with some default services
     this.initializeDefaultServices();
+    
+    // Initialize demo user and test transactions
+    this.initializeDemoData();
   }
 
   private initializeDefaultServices() {
@@ -80,6 +83,111 @@ export class MemStorage implements IStorage {
     
     this.createService(ipCheckService);
     this.createService(vpnService);
+  }
+  
+  private initializeDemoData() {
+    // Создаем демо пользователя, если используется демо режим
+    const demoUser: InsertUser = {
+      telegramId: 12345678,
+      username: "demo_user",
+      firstName: "Demo",
+      lastName: "User",
+      photoUrl: null,
+    };
+    
+    // Добавляем демо-пользователя
+    this.createUser({
+      telegramId: 12345678, 
+      username: "demo_user",
+      firstName: "Demo",
+      lastName: "User",
+      photoUrl: null
+    }).then(user => {
+      // Добавляем тестовые транзакции
+      const now = new Date();
+      
+      // Пополнение баланса
+      const topupTransaction: InsertTransaction = {
+        userId: user.id,
+        type: 'topup',
+        amount: 50.0,
+        description: 'Пополнение баланса',
+        reference: 'TG12345678',
+        serviceId: null,
+      };
+      
+      // Покупка проверки IP
+      const ipCheckTransaction: InsertTransaction = {
+        userId: user.id,
+        type: 'purchase',
+        amount: 5.0,
+        description: 'Проверка IP адреса',
+        reference: null,
+        serviceId: 1,
+      };
+      
+      // Покупка VPN подписки
+      const vpnTransaction: InsertTransaction = {
+        userId: user.id,
+        type: 'purchase',
+        amount: 20.0,
+        description: 'VPN Подписка (1 месяц)',
+        reference: null,
+        serviceId: 2,
+      };
+      
+      // Добавляем транзакции с разными датами для демонстрации
+      const createDelayedTransaction = (transaction: InsertTransaction, daysAgo: number) => {
+        const date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        
+        this.createTransaction(transaction).then(tx => {
+          // Обновляем дату транзакции на нужное значение (для демо)
+          const updatedTx: Transaction = {
+            ...tx,
+            createdAt: date
+          };
+          this.transactions.set(tx.id, updatedTx);
+        });
+      };
+      
+      // Создаем транзакции с разным временем
+      createDelayedTransaction(topupTransaction, 7); // Неделю назад
+      createDelayedTransaction(ipCheckTransaction, 5); // 5 дней назад
+      createDelayedTransaction(vpnTransaction, 2); // 2 дня назад
+      
+      // Обновляем баланс пользователя (50 - 5 - 20 = 25)
+      this.updateUserBalance(user.id, 25.0);
+      
+      // Добавляем результат проверки IP
+      const ipCheckResult: InsertIpCheck = {
+        userId: user.id,
+        ipAddress: '8.8.8.8',
+        country: 'США',
+        city: 'Маунтин-Вью',
+        isp: 'Google LLC',
+        isSpam: false,
+        isBlacklisted: false,
+        details: {
+          hostname: 'dns.google',
+          org: 'Google LLC',
+          timezone: 'America/Los_Angeles'
+        }
+      };
+      
+      // Создаем проверку IP
+      this.createIpCheck(ipCheckResult).then(ipCheck => {
+        // Задаем дату для проверки IP (совпадает с транзакцией)
+        const date = new Date();
+        date.setDate(date.getDate() - 5);
+        
+        const updatedIpCheck: IpCheck = {
+          ...ipCheck,
+          createdAt: date
+        };
+        this.ipChecks.set(ipCheck.id, updatedIpCheck);
+      });
+    });
   }
 
   // User methods
