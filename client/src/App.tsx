@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTelegramUser } from "./lib/telegramWebApp";
 import { User } from "@shared/schema";
@@ -38,32 +38,34 @@ function App() {
     }
   }, [toast, isDevelopment]);
 
-  // Храним историю перемещений для поддержки кнопки Назад
-  const [navigationHistory, setNavigationHistory] = useState<string[]>(['/']);
-  
-  // Отслеживаем историю перемещений
-  useEffect(() => {
-    // Добавляем текущее местоположение в историю, если оно отличается от последнего
-    if (location !== navigationHistory[navigationHistory.length - 1]) {
-      setNavigationHistory(prev => [...prev, location]);
+  // Функция для возврата на предыдущую страницу по иерархии
+  const goBack = useCallback(() => {
+    // Определяем текущий уровень иерархии
+    // Главная страница '/' - самая высокая в иерархии
+    if (location === '/') {
+      return; // На главной странице некуда возвращаться
     }
-  }, [location, navigationHistory]);
-  
-  // Функция для возврата на предыдущую страницу
-  const goBack = () => {
-    if (navigationHistory.length > 1) {
-      // Удаляем текущее местоположение из истории
-      const newHistory = [...navigationHistory];
-      newHistory.pop();
-      
-      // Переходим на предыдущее местоположение
-      const previousLocation = newHistory[newHistory.length - 1];
-      setLocation(previousLocation);
-      
-      // Обновляем историю
-      setNavigationHistory(newHistory);
+
+    // Страницы второго уровня - те, на которые можно перейти с главной
+    // Сюда относятся /services, /transactions, /profile, /topup
+    const secondLevelPages = ['/services', '/transactions', '/profile', '/topup'];
+    
+    if (secondLevelPages.includes(location)) {
+      // Со второго уровня возвращаемся на главную
+      setLocation('/');
+      return;
     }
-  };
+
+    // Страницы третьего уровня - детализация транзакций
+    if (location.startsWith('/transaction/')) {
+      // С детализации транзакций возвращаемся на список транзакций
+      setLocation('/transactions');
+      return;
+    }
+
+    // Для всех остальных случаев (если такие будут) - возврат на главную
+    setLocation('/');
+  }, [location, setLocation]);
   
   // Setup back button handling
   useEffect(() => {
@@ -72,9 +74,7 @@ function App() {
       showBackButton();
       
       // Configure back button handler to go back to previous page
-      onBackButtonClicked(() => {
-        goBack();
-      });
+      onBackButtonClicked(goBack);
     } else {
       hideBackButton();
     }
@@ -83,7 +83,7 @@ function App() {
     return () => {
       hideBackButton();
     };
-  }, [location, setLocation, navigationHistory]);
+  }, [location, goBack]);
 
   // Authenticate user with server
   const { data: user, isLoading, error } = useQuery<User>({

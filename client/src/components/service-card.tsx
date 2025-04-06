@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ipSearchIcon from '../assets/ip_check_icon.png';
+import phoneIcon from '../assets/phone_check_icon.png';
 
 interface ServiceCardProps {
   service: Service;
@@ -40,6 +41,8 @@ export default function ServiceCard({
           </div>
           {service.name === 'Проверка IP адреса' ? (
             <img src={ipSearchIcon} alt="IP Check" className="w-16 h-16" />
+          ) : service.name === 'Проверка номера телефона' ? (
+            <img src={phoneIcon} alt="Phone Check" className="w-16 h-16" />
           ) : (
             <span className="material-icons text-blue-600 text-2xl">{service.icon}</span>
           )}

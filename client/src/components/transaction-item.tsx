@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { useLocation } from 'wouter';
 import { ChevronRight } from 'lucide-react';
 import ipSearchIcon from '../assets/ip_check_icon.png';
+import phoneIcon from '../assets/phone_check_icon.png';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -25,8 +26,12 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
       <div className="flex items-center">
         {isIncome ? (
           <span className="material-icons mr-3 text-gray-500">payment</span>
-        ) : (
+        ) : transaction.description.includes('IP') ? (
           <img src={ipSearchIcon} alt="IP Check" className="w-12 h-12 mr-3" />
+        ) : transaction.description.includes('телефон') ? (
+          <img src={phoneIcon} alt="Phone Check" className="w-12 h-12 mr-3" />
+        ) : (
+          <span className="material-icons mr-3 text-gray-500">shopping_cart</span>
         )}
         <div>
           <p className="font-medium">{transaction.description}</p>
