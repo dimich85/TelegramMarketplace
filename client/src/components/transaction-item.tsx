@@ -2,6 +2,7 @@ import { Transaction } from '@shared/schema';
 import { format } from 'date-fns';
 import { useLocation } from 'wouter';
 import { ChevronRight } from 'lucide-react';
+import ipSearchIcon from '../assets/ip_search_icon.png';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -22,9 +23,11 @@ export default function TransactionItem({ transaction }: TransactionItemProps) {
       onClick={goToTransactionDetails}
     >
       <div className="flex items-center">
-        <span className="material-icons mr-3 text-gray-500">
-          {isIncome ? 'payment' : 'receipt_long'}
-        </span>
+        {isIncome ? (
+          <span className="material-icons mr-3 text-gray-500">payment</span>
+        ) : (
+          <img src={ipSearchIcon} alt="IP Check" className="w-6 h-6 mr-3" />
+        )}
         <div>
           <p className="font-medium">{transaction.description}</p>
           <p className="text-xs text-gray-500">{formattedDate}</p>

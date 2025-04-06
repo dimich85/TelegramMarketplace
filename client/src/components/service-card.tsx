@@ -2,6 +2,7 @@ import { Service } from '@shared/schema';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import ipSearchIcon from '../assets/ip_search_icon.png';
 
 interface ServiceCardProps {
   service: Service;
@@ -37,7 +38,11 @@ export default function ServiceCard({
               </Badge>
             </div>
           </div>
-          <span className="material-icons text-blue-600 text-2xl">{service.icon}</span>
+          {service.name.includes('IP') ? (
+            <img src={ipSearchIcon} alt="IP Check" className="w-8 h-8" />
+          ) : (
+            <span className="material-icons text-blue-600 text-2xl">{service.icon}</span>
+          )}
         </div>
         
         <Button 
