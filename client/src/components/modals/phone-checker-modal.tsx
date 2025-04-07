@@ -186,6 +186,7 @@ export default function PhoneCheckerModal({
       const fraudScore = Math.floor(Math.random() * 80) + 20;
       const isSpam = fraudScore > 75;
       const isVirtual = Math.random() > 0.7;
+      const transactionId = Math.floor(Math.random() * 1000) + 5;
       
       const mockResult: PhoneCheckResult = {
         phoneCheck: {
@@ -206,29 +207,34 @@ export default function PhoneCheckerModal({
           createdAt: new Date().toISOString()
         },
         userBalance: 49.55 - 0.25,
-        transactionId: Math.floor(Math.random() * 1000) + 5
+        transactionId: transactionId
       };
       
-      setCheckResult(mockResult);
+      // Закрываем модальное окно
+      handleClose();
       
+      // Показываем уведомление об успехе
       toast({
         title: "Проверка выполнена",
         description: "Номер телефона успешно проверен 🎉",
       });
+      
+      // Переходим на страницу деталей транзакции
+      navigate(`/transaction/${transactionId}`);
+      
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Ошибка проверки",
         description: "Не удалось проверить номер телефона. Попробуйте позже."
       });
-    } finally {
       setIsChecking(false);
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px] fixed top-[210px] max-h-[calc(100vh-270px)] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] fixed top-[230px] max-h-[calc(100vh-290px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <img src={phoneCheckIcon} alt="Phone Check" className="w-12 h-12" />
