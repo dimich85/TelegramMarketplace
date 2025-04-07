@@ -43,8 +43,7 @@ export default function AssetItem({ service, onSelect }: AssetItemProps) {
         </div>
       </div>
       <div className="text-right">
-        <div className="text-base font-medium">1 шт.</div>
-        <div className="text-sm text-gray-400">0₽</div>
+        <div className="text-base font-medium">∞ ед.</div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/ui/icons";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronRight } from "lucide-react";
 import phoneCheckIcon from "../../assets/phone_check_icon.png";
 
 interface PhoneCheckerModalProps {
@@ -124,6 +125,7 @@ export default function PhoneCheckerModal({
   const [checkResult, setCheckResult] = useState<PhoneCheckResult | null>(null);
   const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [, navigate] = useLocation();
 
   // Обработчик изменения ввода номера телефона
   const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -226,10 +228,10 @@ export default function PhoneCheckerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px] fixed top-[180px] max-h-[calc(100vh-240px)] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px] fixed top-[210px] max-h-[calc(100vh-270px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <img src={phoneCheckIcon} alt="Phone Check" className="w-6 h-6" />
+            <img src={phoneCheckIcon} alt="Phone Check" className="w-12 h-12" />
             Проверка номера телефона
           </DialogTitle>
         </DialogHeader>
@@ -237,22 +239,34 @@ export default function PhoneCheckerModal({
         {!checkResult ? (
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone-number">Введите номер телефона</Label>
+              <p className="text-sm text-gray-600 mb-4">
+                Проверка виртуального и резидентного номера телефона на спам и мошенничество.
+                Отчет формируется на основе запроса к популярным системам защиты от мошенничества. Это позволяет предотвратить блокировку по номеру телефона при работе с популярными онлайн-сервисами.
+              </p>
+              <Label htmlFor="phone-number">Введите номер телефона:</Label>
               <div className="flex space-x-2">
                 <Input
                   id="phone-number"
                   ref={inputRef}
-                  placeholder="+7 (999) 123-45-67"
+                  placeholder=""
                   value={phoneNumber}
                   onChange={handlePhoneInputChange}
                   className="flex-1"
+                  inputMode="tel"
+                  onKeyPress={(e) => {
+                    // Разрешаем только цифры и точку
+                    const char = String.fromCharCode(e.charCode);
+                    if (!/[0-9+]/.test(char)) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
                 <Button variant="outline" onClick={handlePaste} type="button">
                   <Icons.paste className="h-4 w-4" />
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Формат: международный формат с кодом страны
+                Формат: с кодом страны (например, +48123456789)
               </p>
             </div>
             
@@ -360,11 +374,15 @@ export default function PhoneCheckerModal({
               </Button>
               
               <Button 
-                variant="secondary" 
-                onClick={resetForm}
+                onClick={() => {
+                  handleClose();
+                  if (checkResult.transactionId) {
+                    navigate(`/transaction/${checkResult.transactionId}`);
+                  }
+                }}
               >
-                <Icons.refresh className="mr-2 h-4 w-4" />
-                Новая проверка
+                <ChevronRight className="mr-2 h-4 w-4" />
+                Детали транзакции
               </Button>
             </div>
           </div>
