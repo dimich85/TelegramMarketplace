@@ -186,7 +186,8 @@ export default function PhoneCheckerModal({
       const fraudScore = Math.floor(Math.random() * 80) + 20;
       const isSpam = fraudScore > 75;
       const isVirtual = Math.random() > 0.7;
-      const transactionId = Math.floor(Math.random() * 1000) + 5;
+      // Используем фиксированный ID транзакции, который точно существует в системе (из логов)
+      const transactionId = 3; // ID существующей транзакции для проверки телефона
       
       const mockResult: PhoneCheckResult = {
         phoneCheck: {
