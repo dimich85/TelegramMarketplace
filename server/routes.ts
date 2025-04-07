@@ -7,9 +7,12 @@ import {
   insertUserSchema, 
   topUpSchema, 
   ipCheckRequestSchema,
+  phoneCheckRequestSchema,
   purchaseServiceSchema,
-  type IpCheckRequest
+  type IpCheckRequest,
+  type PhoneCheckRequest
 } from "@shared/schema";
+import { z as zod } from "zod";
 import { z } from "zod";
 
 // CryptoCloud API constants
@@ -192,6 +195,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Если это услуга проверки IP, получаем связанную проверку IP
       let ipCheck = null;
+      let phoneCheck = null;
+      
       if (transaction.serviceId === 1) { // ID сервиса проверки IP
         const ipChecks = await storage.getUserIpChecks(transaction.userId);
         // Находим проверку IP, которая совпадает по времени с транзакцией (с точностью до минуты)
@@ -201,9 +206,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Находим проверки в пределах 5 минут от транзакции
           return Math.abs(transactionTime - ipCheckTime) < 5 * 60 * 1000;
         });
+      } else if (transaction.serviceId === 2) { // ID сервиса проверки телефона
+        const phoneChecks = await storage.getUserPhoneChecks(transaction.userId);
+        // Находим проверку телефона, которая совпадает по времени с транзакцией (с точностью до минуты)
+        phoneCheck = phoneChecks.find(check => {
+          const transactionTime = new Date(transaction.createdAt).getTime();
+          const phoneCheckTime = new Date(check.createdAt).getTime();
+          // Находим проверки в пределах 5 минут от транзакции
+          return Math.abs(transactionTime - phoneCheckTime) < 5 * 60 * 1000;
+        });
       }
       
-      return res.status(200).json({ transaction, service, ipCheck });
+      return res.status(200).json({ transaction, service, ipCheck, phoneCheck });
     } catch (error) {
       console.error('Get transaction details error:', error);
       return res.status(500).json({ message: 'Failed to retrieve transaction details' });
@@ -372,6 +386,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Phone Checking service
+  app.post('/api/phone/check', async (req: Request, res: Response) => {
+    try {
+      const { phoneNumber } = phoneCheckRequestSchema.parse(req.body);
+      const { userId } = req.body;
+      
+      // Check if user has enough balance
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Get Phone checking service
+      const services = await storage.getServices();
+      const phoneService = services.find(s => s.name.includes('телефона'));
+      
+      if (!phoneService) {
+        return res.status(404).json({ message: 'Phone checking service not found' });
+      }
+      
+      if (user.balance < phoneService.price) {
+        return res.status(400).json({ message: 'Insufficient balance' });
+      }
+      
+      // В реальном приложении здесь был бы вызов внешнего API для проверки телефона
+      // В демо-версии генерируем случайные данные
+      const isSpam = Math.random() > 0.8;
+      const isVirtual = Math.random() > 0.7;
+      const fraudScore = Math.floor(Math.random() * 80) + 20;
+      
+      // Create Phone check record
+      const phoneCheck = await storage.createPhoneCheck({
+        userId: user.id,
+        phoneNumber,
+        country: "Россия",
+        operator: "МТС",
+        isActive: true,
+        isSpam,
+        isVirtual,
+        fraudScore,
+        details: {
+          valid: true,
+          verified: true,
+          lastActivity: new Date().toISOString().split('T')[0]
+        }
+      });
+      
+      // Deduct balance and create transaction
+      const newBalance = user.balance - phoneService.price;
+      await storage.updateUserBalance(user.id, newBalance);
+      
+      // Создаем транзакцию и получаем ее ID для передачи на клиент
+      const transaction = await storage.createTransaction({
+        userId: user.id,
+        type: 'purchase',
+        amount: phoneService.price,
+        description: 'Проверка номера телефона',
+        serviceId: phoneService.id
+      });
+      
+      return res.status(200).json({
+        phoneCheck,
+        userBalance: newBalance,
+        transactionId: transaction.id // Добавляем ID транзакции в ответ
+      });
+    } catch (error) {
+      console.error('Phone check error:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid phone number', errors: error.errors });
+      }
+      return res.status(500).json({ message: 'Failed to check phone number' });
+    }
+  });
+  
   // Purchase service route
   app.post('/api/service/purchase', async (req: Request, res: Response) => {
     try {
@@ -398,11 +487,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Insufficient balance' });
       }
       
-      // If it's IP service, the actual check is done in a separate endpoint
-      if (service.name.includes('IP')) {
+      // If it's IP service or Phone service, the actual check is done in a separate endpoint
+      if (service.name.includes('IP') || service.name.includes('телефона')) {
+        const serviceName = service.name.includes('IP') ? 'IP check' : 'phone check';
         return res.status(200).json({
           success: true,
-          message: 'Please use the IP check endpoint to process this service'
+          message: `Please use the ${serviceName} endpoint to process this service`
         });
       }
       

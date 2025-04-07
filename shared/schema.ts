@@ -83,6 +83,29 @@ export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type IpCheck = typeof ipChecks.$inferSelect;
 export type InsertIpCheck = z.infer<typeof insertIpCheckSchema>;
 
+// Таблица Phone Check результатов
+export const phoneChecks = pgTable("phone_checks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+  country: text("country"),
+  operator: text("operator"),
+  isActive: boolean("is_active"),
+  isSpam: boolean("is_spam"),
+  isVirtual: boolean("is_virtual"),
+  fraudScore: integer("fraud_score"),
+  details: jsonb("details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPhoneCheckSchema = createInsertSchema(phoneChecks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PhoneCheck = typeof phoneChecks.$inferSelect;
+export type InsertPhoneCheck = z.infer<typeof insertPhoneCheckSchema>;
+
 // DTO schemas for API requests/responses
 export const topUpSchema = z.object({
   amount: z.number().min(10),
@@ -92,10 +115,15 @@ export const ipCheckRequestSchema = z.object({
   ipAddress: z.string().ip(),
 });
 
+export const phoneCheckRequestSchema = z.object({
+  phoneNumber: z.string().min(8).max(15),
+});
+
 export const purchaseServiceSchema = z.object({
   serviceId: z.number().int().positive(),
 });
 
 export type TopUpRequest = z.infer<typeof topUpSchema>;
 export type IpCheckRequest = z.infer<typeof ipCheckRequestSchema>;
+export type PhoneCheckRequest = z.infer<typeof phoneCheckRequestSchema>;
 export type PurchaseServiceRequest = z.infer<typeof purchaseServiceSchema>;

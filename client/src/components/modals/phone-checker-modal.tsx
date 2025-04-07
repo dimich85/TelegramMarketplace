@@ -164,7 +164,7 @@ export default function PhoneCheckerModal({
     }
   }, [toast]);
 
-  // Фейковая функция проверки номера телефона (имитация реального API)
+  // Функция проверки номера телефона через API
   const checkPhoneNumber = async () => {
     if (!phoneNumber.trim()) {
       toast({
@@ -178,38 +178,25 @@ export default function PhoneCheckerModal({
     try {
       setIsChecking(true);
 
-      // Имитация API-запроса
-      // TODO: Заменить на реальный вызов API при необходимости
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Генерируем случайные данные для демонстрации
-      const fraudScore = Math.floor(Math.random() * 80) + 20;
-      const isSpam = fraudScore > 75;
-      const isVirtual = Math.random() > 0.7;
-      // Используем фиксированный ID транзакции, который точно существует в системе (из логов)
-      const transactionId = 3; // ID существующей транзакции для проверки телефона
-      
-      const mockResult: PhoneCheckResult = {
-        phoneCheck: {
-          id: 1,
-          userId: userId,
-          phoneNumber: phoneNumber,
-          country: "Россия",
-          operator: "МТС",
-          isActive: true,
-          isSpam: isSpam,
-          isVirtual: isVirtual,
-          fraudScore: fraudScore,
-          details: {
-            valid: true,
-            verified: true,
-            lastActivity: "2025-03-24"
-          },
-          createdAt: new Date().toISOString()
+      // Вызов реального API для проверки номера телефона
+      const response = await fetch('/api/phone/check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        userBalance: 49.55 - 0.25,
-        transactionId: transactionId
-      };
+        body: JSON.stringify({
+          phoneNumber: phoneNumber,
+          userId: userId
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка при проверке номера');
+      }
+
+      const data = await response.json();
+      const { phoneCheck, userBalance, transactionId } = data;
       
       // Закрываем модальное окно
       handleClose();
@@ -224,10 +211,11 @@ export default function PhoneCheckerModal({
       navigate(`/transaction/${transactionId}`);
       
     } catch (error) {
+      console.error('Ошибка при проверке номера телефона:', error);
       toast({
         variant: "destructive",
         title: "Ошибка проверки",
-        description: "Не удалось проверить номер телефона. Попробуйте позже."
+        description: error instanceof Error ? error.message : "Не удалось проверить номер телефона. Попробуйте позже."
       });
       setIsChecking(false);
     }

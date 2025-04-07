@@ -3,6 +3,7 @@ import {
   services, 
   transactions, 
   ipChecks, 
+  phoneChecks,
   type User, 
   type InsertUser, 
   type Service, 
@@ -10,7 +11,9 @@ import {
   type Transaction,
   type InsertTransaction,
   type IpCheck,
-  type InsertIpCheck
+  type InsertIpCheck,
+  type PhoneCheck,
+  type InsertPhoneCheck
 } from "@shared/schema";
 
 export interface IStorage {
@@ -35,6 +38,11 @@ export interface IStorage {
   createIpCheck(ipCheck: InsertIpCheck): Promise<IpCheck>;
   getUserIpChecks(userId: number): Promise<IpCheck[]>;
   getIpCheck(id: number): Promise<IpCheck | undefined>;
+  
+  // Phone Checks management
+  createPhoneCheck(phoneCheck: InsertPhoneCheck): Promise<PhoneCheck>;
+  getUserPhoneChecks(userId: number): Promise<PhoneCheck[]>;
+  getPhoneCheck(id: number): Promise<PhoneCheck | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -42,20 +50,24 @@ export class MemStorage implements IStorage {
   private services: Map<number, Service>;
   private transactions: Map<number, Transaction>;
   private ipChecks: Map<number, IpCheck>;
+  private phoneChecks: Map<number, PhoneCheck>;
   private userIdCounter: number;
   private serviceIdCounter: number;
   private transactionIdCounter: number;
   private ipCheckIdCounter: number;
+  private phoneCheckIdCounter: number;
 
   constructor() {
     this.users = new Map();
     this.services = new Map();
     this.transactions = new Map();
     this.ipChecks = new Map();
+    this.phoneChecks = new Map();
     this.userIdCounter = 1;
     this.serviceIdCounter = 1;
     this.transactionIdCounter = 1;
     this.ipCheckIdCounter = 1;
+    this.phoneCheckIdCounter = 1;
     
     // Initialize with some default services
     this.initializeDefaultServices();
@@ -187,6 +199,36 @@ export class MemStorage implements IStorage {
         };
         this.ipChecks.set(ipCheck.id, updatedIpCheck);
       });
+      
+      // Добавляем результат проверки телефона
+      const phoneCheckResult: InsertPhoneCheck = {
+        userId: user.id,
+        phoneNumber: '+79123456789',
+        country: 'Россия',
+        operator: 'МТС',
+        isActive: true,
+        isSpam: false,
+        isVirtual: false,
+        fraudScore: 25,
+        details: {
+          valid: true,
+          verified: true,
+          lastActivity: '2025-03-24'
+        }
+      };
+      
+      // Создаем проверку телефона
+      this.createPhoneCheck(phoneCheckResult).then(phoneCheck => {
+        // Задаем дату для проверки телефона (совпадает с транзакцией)
+        const date = new Date();
+        date.setDate(date.getDate() - 2);
+        
+        const updatedPhoneCheck: PhoneCheck = {
+          ...phoneCheck,
+          createdAt: date
+        };
+        this.phoneChecks.set(phoneCheck.id, updatedPhoneCheck);
+      });
     });
   }
 
@@ -308,6 +350,36 @@ export class MemStorage implements IStorage {
 
   async getIpCheck(id: number): Promise<IpCheck | undefined> {
     return this.ipChecks.get(id);
+  }
+  
+  // Phone Check methods
+  async createPhoneCheck(insertPhoneCheck: InsertPhoneCheck): Promise<PhoneCheck> {
+    const id = this.phoneCheckIdCounter++;
+    const createdAt = new Date();
+    const phoneCheck: PhoneCheck = { 
+      ...insertPhoneCheck, 
+      id, 
+      createdAt,
+      country: insertPhoneCheck.country ?? null,
+      operator: insertPhoneCheck.operator ?? null,
+      isActive: insertPhoneCheck.isActive ?? null,
+      isSpam: insertPhoneCheck.isSpam ?? null,
+      isVirtual: insertPhoneCheck.isVirtual ?? null,
+      fraudScore: insertPhoneCheck.fraudScore ?? null,
+      details: insertPhoneCheck.details ?? null
+    };
+    this.phoneChecks.set(id, phoneCheck);
+    return phoneCheck;
+  }
+
+  async getUserPhoneChecks(userId: number): Promise<PhoneCheck[]> {
+    return Array.from(this.phoneChecks.values())
+      .filter(phoneCheck => phoneCheck.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getPhoneCheck(id: number): Promise<PhoneCheck | undefined> {
+    return this.phoneChecks.get(id);
   }
 }
 
